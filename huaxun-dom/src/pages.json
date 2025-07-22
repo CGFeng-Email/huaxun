@@ -1,9 +1,117 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [ //pages数组中第一项表示应用启动页
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "uni-app"
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/case/index",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "案例展管"
+			}
+		},
+		{
+			"path": "pages/case/details",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/consult/index"
+		},
+		{
+			"path": "pages/design/index",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "设计团队"
+			}
+		},
+		{
+			"path": "pages/design/details",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/design/collect",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "设计师收藏"
+			}
+		},
+		{
+			"path": "pages/me/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/me/personalData",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "个人资料"
+			}
+		},
+		{
+			"path": "pages/case/collect",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "案例收藏"
+			}
+		},
+		{
+			"path": "pages/steward/index",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "工程管家"
+			}
+		},
+		{
+			"path": "pages/steward/details",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/steward/collect",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "工程管家"
+			}
+		},
+		{
+			"path": "pages/project/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/aboutUs/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/knowledge/index",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "装修知识"
+			}
+		},
+		{
+			"path": "pages/knowledge/details",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/search/index",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "搜索"
 			}
 		}
 	],
@@ -12,5 +120,41 @@
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#fff",
+		"selectedColor": "#fff",
+		"backgroundColor": "#FF4E00",
+		"list": [{
+				"iconPath": "/static/img/tabbar_home.png",
+				"selectedIconPath": "/static/img/tabbar_home.png",
+				"pagePath": "pages/index/index",
+				"text": "首页"
+			},
+			{
+				"iconPath": "/static/img/tabbar_case.png",
+				"selectedIconPath": "/static/img/tabbar_case.png",
+				"pagePath": "pages/case/index",
+				"text": "案例展馆"
+			},
+			{
+				"iconPath": "/static/img/tabbar_consult.png",
+				"selectedIconPath": "/static/img/tabbar_consult.png",
+				"pagePath": "pages/consult/index",
+				"text": "预约咨询"
+			},
+			{
+				"iconPath": "/static/img/tabbar_design.png",
+				"selectedIconPath": "/static/img/tabbar_design.png",
+				"pagePath": "pages/design/index",
+				"text": "设计团队"
+			},
+			{
+				"iconPath": "/static/img/tabbar_me.png",
+				"selectedIconPath": "/static/img/tabbar_me.png",
+				"pagePath": "pages/me/index",
+				"text": "我的"
+			}
+		]
 	}
 }
