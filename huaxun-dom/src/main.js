@@ -3,16 +3,27 @@ import {
 } from "vue";
 import App from "./App.vue";
 
-// hbuilderx导入安装的配置方式：
+import {
+	Request
+} from './request/index.js';
+
 import uvUI from '@/uni_modules/uv-ui-tools';
 
+import Login from '@/component/login/index.vue';
+
 export function createApp() {
+	
 	const app = createSSRApp(App);
+
+	app.component('Login', Login);
 
 	// 挂载
 	app.use(uvUI, {
 		mpShare: true
 	});
+
+	// 引入请求封装
+	Request(app);
 
 	// 需要在Vue.use(uvUI)之后执行
 	uni.$uv.setConfig({

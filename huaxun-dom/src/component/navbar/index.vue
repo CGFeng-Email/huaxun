@@ -1,6 +1,6 @@
 <template>
 	<view class="navbar">
-		<uv-navbar @leftClick="leftClick" :bgColor="pageScroll > 70 ? '#fff' : 'transparent'" :placeholder="noReturn">
+		<uv-navbar @leftClick="leftClick" :bgColor="pageScroll >= 70 ? '#fff' : 'transparent'" :placeholder="noReturn">
 			<template v-slot:left>
 				<view class="icon" v-if="!noReturn">
 					<uv-icon name="arrow-left" color="#000" size="40"></uv-icon>
@@ -49,7 +49,8 @@
 		}
 
 		::v-deep .title {
-			font-size: 17px;
+			font-size: 16px;
+			font-weight: 500;
 		}
 		
 		.white {

@@ -71,7 +71,7 @@
 					收藏
 				</view>
 			</view>
-			<uv-button openType="contact" color="transparent" :customStyle="{
+			<uv-button openType="share" color="transparent" :customStyle="{
 				display: 'inline-block',
 				padding: '20rpx 30rpx',
 				textAlign: 'center',
@@ -129,6 +129,7 @@
 
 <script setup>
 	import Navbar from '@/component/navbar';
+	
 	import {
 		ref
 	} from 'vue';
@@ -178,7 +179,9 @@
 	}
 
 	const pageScroll = ref(0);
+
 	onPageScroll((e) => {
+		if (e.scrollTop > 300) return;
 		pageScroll.value = e.scrollTop;
 	})
 </script>

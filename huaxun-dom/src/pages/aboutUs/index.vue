@@ -1,7 +1,7 @@
 <template>
 	<Navbar title="关于我们" :pageScroll="pageScroll"></Navbar>
 	<view class="banner">
-		<image class="cover" src="/static/img/about_banner.jpg" mode="widthFix"></image>
+		<image class="cover" src="https://project-1317202885.cos.ap-guangzhou.myqcloud.com/about_banner.jpg" mode="widthFix"></image>
 	</view>
 	<view class="main">
 		<view class="title">

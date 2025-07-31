@@ -1,24 +1,25 @@
 <template>
-	<uv-sticky :index="index" :offsetTop="offsetTop">
-		<view class="tabs_box">
+	<view class="static" :style="'top:'+offsetTop+'px'" :index="index">
+		<view class="tabs_box justify_center">
 			<view class="item justify_space">
 				<view class="name">{{title}}</view>
 				<view class="list">
-					<uv-tabs :list="list" :current="currentIndex" @click="click" lineColor="#FF4E00" lineWidth="80"
+					<uv-tabs :list="list" :current="currentIndex" @click="click" lineColor="#FFF" lineWidth="80"
 						lineHeight="4" :activeStyle="{
 						color: '#FF4E00',
 						fontSize: '14px',
-						transform: 'scale(1)'
+						transform: 'scale(1)',
+						padding: '0'
 					}" :inactiveStyle="{
 						color: '#000',
 						fontSize: '14px',
 						transform: 'scale(1)',
-						padding: '0 4px'
+						padding: '0'
 					}" itemStyle="height: 40px;"></uv-tabs>
 				</view>
 			</view>
 		</view>
-	</uv-sticky>
+	</view>
 </template>
 
 <script setup>
@@ -67,7 +68,14 @@
 </script>
 
 <style lang="scss" scoped>
+	.static {
+		position: sticky;
+		left: 0;
+		width: 100%;
+	}
+
 	.tabs_box {
+		height: 90rpx;
 		background: #fff;
 
 		.item {

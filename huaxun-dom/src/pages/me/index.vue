@@ -1,7 +1,7 @@
 <template>
 	<Navbar title="我的" :pageScroll="pageScroll" :noReturn="true"></Navbar>
 	<view class="banner">
-		<image class="cover" src="/static/img/me_bg.jpg" mode="widthFix"></image>
+		<image class="cover" src="https://project-1317202885.cos.ap-guangzhou.myqcloud.com/me_bg.jpg" mode="widthFix"></image>
 	</view>
 	<view class="user justify_center">
 		<view class="head_portrait justify_center">
@@ -14,7 +14,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="set justify_center">
+		<view class="set justify_center" @click="openPersonalData">
 			<i class="iconfont icon-shezhi"></i>
 			<text class="text">个人资料</text>
 		</view>
@@ -140,6 +140,12 @@
 	const openStewardCollect = () => {
 		uni.navigateTo({
 			url: '/pages/steward/collect'
+		})
+	}
+	
+	const openPersonalData = () => {
+		uni.navigateTo({
+			url: '/pages/me/personalData'
 		})
 	}
 

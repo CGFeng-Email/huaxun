@@ -4,10 +4,17 @@
 		<view v-for="(item,index) in list" :key="item.iconfont" :class="['item', item.bulge ? 'bulge' : '' ]"
 			@click="switchTab(item,index)">
 			<view v-if="item.bulge" class="bulgeItem">
-				<image class="image" :src="item.iconPath" mode="widthFix" />
+				<uv-button openType="contact" :customStyle="{
+				display: 'inline-block',
+				padding: '0',
+				textAlign: 'center',
+				height: 'auto'
+			}">
+					<image class="image" :src="item.iconPath" mode="widthFix" />
+				</uv-button>
 			</view>
+
 			<block v-else>
-				<!-- <image class="image" :src="selected == index ? item.selectedIconPath : item.iconPath" mode="widthFix" /> -->
 				<view class="icon">
 					<i :class="['iconfont', selected == index ? item.selectedIconfont : item.iconfont] "></i>
 				</view>
@@ -61,6 +68,7 @@
 	})
 
 	const switchTab = (e, index) => {
+		if (index == 2) return;
 		const url = e.pagePath;
 		getApp().globalData.selected = index;
 		uni.switchTab({
@@ -131,7 +139,6 @@
 				border-radius: 50%;
 				overflow: hidden;
 				background: #fff;
-				z-index: -1;
 				border-top: 1px solid #e6e6e6;
 				box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.05);
 				display: flex;

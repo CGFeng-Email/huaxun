@@ -1,15 +1,13 @@
 <template>
+	<!-- 导航栏 -->
 	<home-navbar :pageScroll="pageScroll"></home-navbar>
+
+	<!-- banner -->
 	<view class="banner_box">
 		<swiper class="banner" autoplay circular skip-hidden-item-layout>
-			<swiper-item>
+			<swiper-item v-for="item in banner" :key="item.id">
 				<view class="item">
-					<image class="img" src="/static/img/index_banner1.jpg" mode="scaleToFill"></image>
-				</view>
-			</swiper-item>
-			<swiper-item>
-				<view class="item">
-					<image class="img" src="/static/img/index_banner1.jpg" mode="scaleToFill"></image>
+					<image class="img" :src="item.thumb" mode="scaleToFill"></image>
 				</view>
 			</swiper-item>
 		</swiper>
@@ -31,6 +29,8 @@
 			<ToBottomAnimate></ToBottomAnimate>
 		</view>
 	</view>
+
+	<!-- 弹窗栏目 -->
 	<view class="consult justify_center">
 		<view class="item" @click="openModal(0)">
 			<view class="cover_box flex_center">
@@ -38,19 +38,19 @@
 			</view>
 			<view class="lead">预约量房</view>
 		</view>
-		<view class="item" @click="openModal(0)">
+		<view class="item" @click="openModal(1)">
 			<view class="cover_box flex_center">
 				<image class="cover" src="/static/img/consult_li2.png" mode="widthFix"></image>
 			</view>
 			<view class="lead">获取报价</view>
 		</view>
-		<view class="item" @click="openModal(0)">
+		<view class="item" @click="openModal(2)">
 			<view class="cover_box flex_center">
 				<image class="cover" src="/static/img/consult_li3.png" mode="widthFix"></image>
 			</view>
 			<view class="lead">预约设计师</view>
 		</view>
-		<view class="item" @click="openModal(0)">
+		<view class="item" @click="openModal(3)">
 			<view class="cover_box flex_center">
 				<image class="cover" src="/static/img/consult_li4.png" mode="widthFix"></image>
 			</view>
@@ -58,11 +58,13 @@
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
+
+	<!-- 预约弹窗 -->
 	<uv-modal ref="modal" @confirm="confirm" :showConfirmButton="false">
 		<view class="slot-content modal">
 			<view class="title">预约量房</view>
 			<view class="lead">
-				今日已有66位业主成功预约工程师量房
+				今日已有 <text class="red">{{ subscribeUserNumber }}</text> 位业主成功预约工程师量房
 			</view>
 			<uv-form labelPosition="left" :model="modalForm" :rules="rules" ref="form">
 				<uv-form-item prop="name">
@@ -75,7 +77,7 @@
 						fontSize="13px" suffixIconStyle="font-size: 18px;">
 					</uv-input>
 				</uv-form-item>
-				<view class="tips flex">
+				<view class="tips justify_center">
 					<i class="iconfont icon-gantanhao"></i>
 					<text>信息保护中，请放心填写</text>
 				</view>
@@ -91,6 +93,8 @@
 			</uv-form>
 		</view>
 	</uv-modal>
+
+	<!-- 在线报价方案 -->
 	<view class="scheme">
 		<view class="title">获取家装报价</view>
 		<view class="lead">
@@ -98,13 +102,13 @@
 				bold></uv-count-to> 位客户成功获取
 		</view>
 		<view class="item box_shadow box_radius">
-			<uv-count-to :startVal="0" :endVal="126387" :decimals="2" decimal="." duration="3000" color="#FF4E00"
+			<uv-count-to :startVal="0" :endVal="squarePrice" :decimals="2" decimal="." duration="3000" color="#FF4E00"
 				fontSize="36" bold></uv-count-to>
 			<text class="ide">元</text>
 		</view>
 		<view class="item box_shadow justify_center box_radius" @click="openPicker">
-			<uv-picker class="picker" ref="picker" :loading="regionsLoading" :columns="addressList" keyName="name"
-				@change="pickerChange" @confirm="pickerConfirm">
+			<uv-picker class="picker" ref="picker" confirmColor="#FF4E00" :loading="regionsLoading"
+				:columns="addressList" keyName="name" @change="pickerChange" @confirm="pickerConfirm">
 			</uv-picker>
 			<view class="picker_text  justify_space">
 				<text class="text">{{ selectValue }}</text>
@@ -112,10 +116,14 @@
 			</view>
 		</view>
 		<view class="size_box justify_center">
-			<view class="box box_shadow box_radius active">80-150㎡</view>
-			<view class="box box_shadow box_radius">150-300㎡</view>
-			<view class="box box_shadow box_radius">300-600㎡</view>
-			<view class="box box_shadow box_radius">600㎡以上</view>
+			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 0 ? 'active' : '']"
+				@click="switchSquare(0, 126387)">80-150㎡</view>
+			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 1 ? 'active' : '']"
+				@click="switchSquare(1, 226387)">150-300㎡</view>
+			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 2 ? 'active' : '']"
+				@click="switchSquare(2, 326387)">300-600㎡</view>
+			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 3 ? 'active' : '']"
+				@click="switchSquare(3, 426387)">600㎡以上</view>
 		</view>
 		<view class="item box_shadow box_radius">
 			<uv-input class="input" v-model="mobile" type="number" placeholder="请输入您的手机号码" color="#000"
@@ -140,56 +148,35 @@
 			*将有工作人员与您联系，提供专属服务
 		</view>
 	</view>
+
 	<!-- 案例swiper -->
 	<view class="case_swiper">
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout @change="caseSwiperChange"
 			:current="caseIndex">
-			<swiper-item class="item">
-				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
-			</swiper-item>
-			<swiper-item class="item">
+			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openCaseDetails">
 				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
 			</swiper-item>
 		</swiper>
-		<view class="case_main img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+		<view class="case_main img_bg"
+			style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 			<view class="title">“精品案例”</view>
 			<swiper class="swiper_main" autoplay @change="caseSwiperChange" :current="caseIndex">
-				<swiper-item class="item">
+				<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openCaseDetails">
 					<view class="name">《琉光·雅寓》</view>
-				</swiper-item>
-				<swiper-item class="item">
-					<view class="name">《琉光·雅致》</view>
 				</swiper-item>
 			</swiper>
 			<view class="more" @click="openCase">查看更多案例</view>
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
+
 	<!-- 团队 -->
-	<view class="teams img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="teams img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“设计团队”</view>
 		<view class="lead">全国5000+设计师任您选，让您的家焕然一新！</view>
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout>
-			<swiper-item class="item justify_space">
-				<view class="modia">
-					<image class="cover" src="/static/img/teams_name1.jpg" mode="scaleToFill"></image>
-				</view>
-				<view class="content">
-					<view class="head">
-						<text class="name">朱炎东</text>
-						<text class="post">总设计师</text>
-					</view>
-					<view class="lead">
-						从事室内设计行业24年擅长风格：新中式，现代简约风格
-					</view>
-					<view class="list flex">
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-					</view>
-				</view>
-			</swiper-item>
-			<swiper-item class="item justify_space">
+			<swiper-item class="item justify_space" v-for="(item,index) in 6" :key="index" @click="openDesignDetails">
 				<view class="modia">
 					<image class="cover" src="/static/img/teams_name1.jpg" mode="scaleToFill"></image>
 				</view>
@@ -212,33 +199,14 @@
 		<view class="common_more inlineBlock" @click="openDesign">查看更多设计师</view>
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
+
 	<!-- 管家团队 -->
-	<view class="teams img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="teams img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“工程管家”</view>
 		<view class="lead">让您温馨的家有专属的管家把控</view>
 		<swiper class="stewoad_swiper" autoplay circular :display-multiple-items="3" skip-hidden-item-layout>
-			<swiper-item class="item">
-				<view class="modia">
-					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
-				</view>
-				<view class="name">朱炎东</view>
-				<view class="port inlineBlock">高级管家</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="modia">
-					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
-				</view>
-				<view class="name">朱炎东</view>
-				<view class="port inlineBlock">高级管家</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="modia">
-					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
-				</view>
-				<view class="name">朱炎东</view>
-				<view class="port inlineBlock">高级管家</view>
-			</swiper-item>
-			<swiper-item class="item">
+			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openStewardDetails">
 				<view class="modia">
 					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
 				</view>
@@ -249,7 +217,10 @@
 		<view class="common_more inlineBlock" @click="openSteward">查看更多管家</view>
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
-	<view class="project img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+
+	<!-- 项目 -->
+	<view class="project img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“工程监控”</view>
 		<view class="sub_head">匠心品质，环保筑家</view>
 		<view class="list">
@@ -301,25 +272,14 @@
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
+
 	<!-- 装修案例 -->
-	<view class="decoration_case img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="decoration_case img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“装修知识”</view>
 		<view class="sub_head">您的装修之旅，从学习装修知识开始</view>
 		<swiper class="swiper" autoplay skip-hidden-item-layout circular next-margin="60px">
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<view class="modia">
-						<image class="cover" src="/static/img/decoration_li1.jpg" mode="scaleToFill"></image>
-					</view>
-					<view class="lead">
-						轻奢大宅设计，呼之欲出的高级感，越看越心水
-					</view>
-					<view class="date">
-						2025.06.09
-					</view>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
+			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openKnowledgeDeatails">
 				<view class="box box_radius box_shadow">
 					<view class="modia">
 						<image class="cover" src="/static/img/decoration_li1.jpg" mode="scaleToFill"></image>
@@ -335,6 +295,11 @@
 		</swiper>
 		<view class="common_more inlineBlock" @click="openKnowledge">查看更多知识</view>
 	</view>
+
+	<!-- 登录 -->
+	<Login :show="login" @loginHide="loginHide"></Login>
+
+	<!-- 底部栏 -->
 	<tabbar></tabbar>
 </template>
 
@@ -352,13 +317,34 @@
 		onMounted,
 		nextTick
 	} from 'vue';
+	import {
+		postBanner,
+		subscribeNumber
+	} from '../../request/api.js';
 
 	const pageScroll = ref(0);
+	const squareIndex = ref(0);
+	const squarePrice = ref(126387);
 	const modal = ref(null);
 	const form = ref(null);
 	const picker = ref(null);
-
 	const modalIndex = ref(0);
+	const login = ref(false);
+	const banner = ref([]);
+	const subscribePopupIndex = ref(0); // 预约弹窗下标
+	const subscribeUserNumber = ref(0); // 预约弹窗客户预约数量
+	const today_measure_sum = ref(0); // 今日预约量房客户数量
+	const today_quotation_sum = ref(0); // 今日家装报价客户数量
+	const today_designer_sum = ref(0); // 今日预约设计师客户数量
+
+	const loginHide = () => {
+		login.value = false;
+	}
+
+	const switchSquare = (index, price) => {
+		squareIndex.value = index;
+		squarePrice.value = price;
+	}
 
 	const rules = ref({
 		'name': {
@@ -387,7 +373,25 @@
 	})
 
 	const openModal = (index) => {
-		modalIndex.value = index;
+		const token = uni.getStorageSync('token');
+
+		if (!token) {
+			login.value = true;
+			return;
+		}
+
+		if (index == 0) {
+			subscribeUserNumber.value = today_measure_sum.value;
+		} else if (index == 1) {
+			subscribeUserNumber.value = today_quotation_sum.value;
+		} else if (index == 2) {
+			subscribeUserNumber.value = today_designer_sum.value;
+		} else {
+			subscribeUserNumber.value = 0;
+		}
+
+		subscribePopupIndex.value = index;
+
 		modal.value.open();
 	}
 
@@ -446,14 +450,12 @@
 	}
 
 	const pickerConfirm = (e) => {
-		console.log('e', e);
 		console.log('确认选择的地区：', `${e.value[0].name}/${e.value[1].name}/${e.value[2].name}`);
 	}
 
 	// 案例swiper
 	const caseIndex = ref(0);
 	const caseSwiperChange = (e) => {
-		console.log(e);
 		caseIndex.value = e.detail.current;
 	}
 
@@ -470,9 +472,21 @@
 		})
 	}
 
+	const openCaseDetails = () => {
+		uni.navigateTo({
+			url: '/pages/case/details'
+		})
+	}
+
 	const openDesign = () => {
 		uni.switchTab({
 			url: '/pages/design/index'
+		})
+	}
+
+	const openDesignDetails = () => {
+		uni.navigateTo({
+			url: '/pages/design/details'
 		})
 	}
 
@@ -481,24 +495,57 @@
 			url: '/pages/steward/index'
 		})
 	}
-	
+
+	const openStewardDetails = () => {
+		uni.navigateTo({
+			url: '/pages/steward/details'
+		})
+	}
+
 	const openProject = () => {
 		uni.navigateTo({
 			url: '/pages/project/index'
 		})
 	}
-	
+
 	const openKnowledge = () => {
 		uni.navigateTo({
 			url: '/pages/knowledge/index'
 		})
 	}
 
-	onMounted(() => {
+	const openKnowledgeDeatails = () => {
+		uni.navigateTo({
+			url: '/pages/knowledge/details'
+		})
+	}
+
+	onMounted(async () => {
 		handlePickValueDefault();
+
+		const bannerList = await postBanner({
+			custom: {
+				catch: true,
+				toast: false
+			}
+		});
+
+		banner.value = bannerList.lists;
+
+		const getSubscribeNumber = await subscribeNumber({
+			custom: {
+				catch: true,
+				toast: false
+			}
+		})
+
+		today_designer_sum.value = getSubscribeNumber.today_designer_sum;
+		today_measure_sum.value = getSubscribeNumber.today_measure_sum;
+		today_quotation_sum.value = getSubscribeNumber.today_quotation_sum;
 	})
 
 	onPageScroll((e) => {
+		if (e.scrollTop > 300) return;
 		pageScroll.value = e.scrollTop;
 	})
 </script>
@@ -825,7 +872,7 @@
 
 		.stewoad_swiper {
 			margin: 40rpx 0 20rpx;
-			height: 170px;
+			height: 186px;
 
 			.item {
 				padding: 0 10rpx;

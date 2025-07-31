@@ -66,7 +66,7 @@
 			</swiper-item>
 		</swiper>
 	</view>
-	<view class="safeguard img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="safeguard img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
 			<uv-count-to :startVal="0" :endVal="6" color="#FF4E00" fontSize="56" bold></uv-count-to>
 			<text class="title">大保障</text>
@@ -119,7 +119,7 @@
 			</swiper-item>
 		</swiper>
 	</view>
-	<view class="honor img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="honor img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
 			<uv-count-to :startVal="0" :endVal="20" color="#FF4E00" fontSize="56" bold></uv-count-to>
 			<text class="title">余项国家发明及实用新型专利</text>
@@ -149,7 +149,7 @@
 	<view class="project_cover">
 		<image class="cover" src="/static/img/project_cover.jpg" mode="widthFix"></image>
 	</view>
-	<view class="serve img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="serve img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
 			<text class="num">一次装修</text>
 			<text class="title">终身维护</text>
@@ -191,7 +191,7 @@
 			</view>
 		</view>
 	</view>
-	<view class="form img_bg" style="background-image: url('/static/img/form_bg.jpg');">
+	<view class="form img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="modal box_radius box_shadow">
 			<view class="title">预约全屋装修</view>
 			<view class="lead">

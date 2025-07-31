@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<uv-navbar :bgColor="pageScroll > 70 ? '#fff' : 'transparent'" :placeholder="noReturn">
+		<uv-navbar :bgColor="pageScrollNumber ? '#fff' : 'transparent'" :placeholder="noReturn">
 			<template v-slot:left>
 				<view class="search justify_center uv-nav-slot" @click="openSearch">
 					<i class="iconfont icon-sousuo"></i>
@@ -9,7 +9,8 @@
 			</template>
 			<template v-slot:center>
 				<div class="logo justify_center">
-					<image class="image" :src="pageScroll > 70 ? '/static/img/home_logo.png' : '/static/img/logo.png'" mode="widthFix">
+					<image class="image" :src="pageScrollNumber ? '/static/img/home_logo.png' : '/static/img/logo.png'"
+						mode="widthFix">
 					</image>
 				</div>
 			</template>
@@ -19,7 +20,8 @@
 
 <script setup>
 	import {
-		defineProps
+		defineProps,
+		computed
 	} from 'vue';
 
 	const props = defineProps({
@@ -32,6 +34,14 @@
 			default: false
 		}
 	})
+
+	const pageScrollNumber = computed(() => {
+		if(props.pageScroll > 70) {
+			return true
+		} else {
+			return false
+		}
+	});
 
 	const openSearch = () => {
 		uni.navigateTo({

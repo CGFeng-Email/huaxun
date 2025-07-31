@@ -80,7 +80,7 @@
 		<view class="tabs_item" v-else>
 			<view v-for="(item, index) in 4" :key="index" class="waterfall-item box_radius box_shadow">
 				<view class="waterfall-item__image">
-					<image src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
+					<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
 				</view>
 				<view class="content">
 					<view class="title">
@@ -114,7 +114,7 @@
 					收藏
 				</view>
 			</view>
-			<uv-button openType="contact" color="transparent" :customStyle="{
+			<uv-button openType="share" color="transparent" :customStyle="{
 				display: 'inline-block',
 				padding: '20rpx 30rpx',
 				textAlign: 'center',
@@ -346,6 +346,12 @@
 			margin-top: 30rpx;
 			border-radius: 6px;
 			padding: 20rpx;
+			
+			.waterfall-item__image {
+				.cover {
+					width: 750rpx;
+				}
+			}
 
 			.content {
 				padding: 20rpx 0 0;

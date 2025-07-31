@@ -1,12 +1,9 @@
 <template>
 	<Search></Search>
-	<Tabs :index="1" title="户型" :list="honseTypeList" :offsetTop="0" :currentIndex="honseTypeIndex"
-		@tabsClick="tabsClick"></Tabs>
-	<Tabs :index="2" title="风格" :list="styleList" :offsetTop="70" :currentIndex="styleIndex" @tabsClick="tabsClick">
-	</Tabs>
-	<Tabs :index="3" title="面积" :list="sizeList" :offsetTop="140" :currentIndex="siezIndex" @tabsClick="tabsClick">
-	</Tabs>
-	<Tabs :index="4" title="全部" :list="allList" :offsetTop="210" :currentIndex="allIndex" @tabsClick="tabsClick"></Tabs>
+	<Tabs :index="1" title="户型" :list="honseTypeList" :offsetTop="-1" :currentIndex="honseTypeIndex" @tabsClick="tabsClick"></Tabs>
+	<Tabs :index="2" title="风格" :list="styleList" :offsetTop="45" :currentIndex="styleIndex" @tabsClick="tabsClick"></Tabs>
+	<Tabs :index="3" title="面积" :list="sizeList" :offsetTop="90" :currentIndex="siezIndex" @tabsClick="tabsClick"></Tabs>
+	<Tabs :index="4" title="全部" :list="allList" :offsetTop="135" :currentIndex="allIndex" @tabsClick="tabsClick"></Tabs>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
 	<view class="list">
 		<uv-waterfall ref="waterfall" v-model="caseList" :add-time="10" :left-gap="leftGap" :right-gap="rightGap"

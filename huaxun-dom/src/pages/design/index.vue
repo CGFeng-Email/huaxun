@@ -1,8 +1,8 @@
 <template>
 	<Search></Search>
-	<Tabs :index="1" title="极品" :list="rankList" :offsetTop="0" :currentIndex="rankIndex" @tabsClick="tabsClick">
+	<Tabs :index="1" title="极品" :list="rankList" :offsetTop="-1" :currentIndex="rankIndex" @tabsClick="tabsClick">
 	</Tabs>
-	<Tabs :index="2" title="风格" :list="styleList" :offsetTop="70" :currentIndex="styleIndex" @tabsClick="tabsClick">
+	<Tabs :index="2" title="风格" :list="styleList" :offsetTop="45" :currentIndex="styleIndex" @tabsClick="tabsClick">
 	</Tabs>
 	<view class="list">
 		<view class="item box_radius box_shadow" v-for="(item,index) in 7" :key="index" @click="openDetails">

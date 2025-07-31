@@ -48,6 +48,12 @@
 		justify-content: space-between;
 		align-items: center;
 	}
+	
+	.justify_end {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
 
 	view,
 	text,
@@ -140,5 +146,11 @@
 	
 	.animate {
 		transform: .4s ease;
+	}
+	
+	.red {
+		font-size: 28rpx;
+		font-weight: 600;
+		color: #FF0000;
 	}
 </style>

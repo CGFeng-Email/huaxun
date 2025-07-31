@@ -63,7 +63,7 @@
 			</view>
 		</view>
 	</view>
-	<view class="case" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="case" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“客厅展示”</view>
 		<view class="cover_box">
 			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
@@ -73,7 +73,7 @@
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#fff"></uv-gap>
-	<view class="case" style="background-image: url('/static/img/case_main_bg.jpg');">
+	<view class="case" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="title">“主卧展示”</view>
 		<view class="cover_box">
 			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
@@ -93,7 +93,7 @@
 				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
 			</swiper-item>
 		</swiper>
-		<view class="case_main img_bg" style="background-image: url('/static/img/case_main_bg.jpg');">
+		<view class="case_main img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 			<view class="title">“推荐案例”</view>
 			<swiper class="swiper_main" autoplay @change="caseSwiperChange" :current="caseIndex">
 				<swiper-item class="item">
