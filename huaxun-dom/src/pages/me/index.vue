@@ -1,7 +1,8 @@
 <template>
 	<Navbar title="我的" :pageScroll="pageScroll" :noReturn="true"></Navbar>
 	<view class="banner">
-		<image class="cover" src="https://project-1317202885.cos.ap-guangzhou.myqcloud.com/me_bg.jpg" mode="widthFix"></image>
+		<image class="cover" src="https://project-1317202885.cos.ap-guangzhou.myqcloud.com/me_bg.jpg" mode="widthFix">
+		</image>
 	</view>
 	<view class="user justify_center">
 		<view class="head_portrait justify_center">
@@ -81,7 +82,7 @@
 						联系信息
 					</view>
 				</view>
-				<view class="item">
+				<view class="item" @click="loginExit">
 					<view class="icon">
 						<i class="iconfont icon-tuichu"></i>
 					</view>
@@ -92,6 +93,11 @@
 			</view>
 		</view>
 	</view>
+
+	<!-- 退出登录弹窗 -->
+	<uv-modal ref="modalExit" title="退出" content='确定要退出当前账户吗？' align="center" :zoom="true" :asyncClose="true"
+		:showCancelButton="true" @confirm="loginExitConfirm" confirmColor="#FF4E00"></uv-modal>
+
 	<tabbar></tabbar>
 </template>
 
@@ -105,7 +111,12 @@
 		onPageScroll
 	} from '@dcloudio/uni-app';
 
+	import {
+		logOut
+	} from '../../request/api.js';
+
 	const pageScroll = ref(0);
+	const modalExit = ref(null);
 
 	const makeCall = () => {
 		uni.makePhoneCall({
@@ -118,35 +129,56 @@
 			url: '/pages/aboutUs/index'
 		})
 	}
-	
+
 	const openKnowledge = () => {
 		uni.navigateTo({
 			url: '/pages/knowledge/index'
 		})
 	}
-	
+
 	const openCaseCollect = () => {
 		uni.navigateTo({
 			url: '/pages/case/collect',
 		})
 	}
-	
+
 	const openDesignCollect = () => {
 		uni.navigateTo({
 			url: '/pages/design/collect'
 		})
 	}
-	
+
 	const openStewardCollect = () => {
 		uni.navigateTo({
 			url: '/pages/steward/collect'
 		})
 	}
-	
+
 	const openPersonalData = () => {
 		uni.navigateTo({
 			url: '/pages/me/personalData'
 		})
+	}
+
+	const loginExit = () => {
+		modalExit.value.open();
+	}
+
+	const loginExitConfirm = async () => {
+
+		const res = await logOut({
+			custom: {
+				token: true,
+				catch: true
+			}
+		})
+		console.log('res', res);
+
+		if (res.code == 1) {
+			// 清楚本地缓存
+			uni.clearStorageSync();
+			modalExit.value.close();
+		}
 	}
 
 	onPageScroll((e) => {

@@ -34,10 +34,11 @@
 	} from 'vue';
 
 	const emit = defineEmits(['loginHide']);
-
+	
 	import {
 		openId,
-		wxLogin
+		wxLogin,
+		getCommonData
 	} from '@/request/api.js';
 
 	// 参数
@@ -88,29 +89,37 @@
 			provider: 'weixin',
 			success: async (res) => {
 				if (res.errMsg == 'login:ok') {
-					
+
 					// 获取openid
 					const reslogin = await openId({
 						code: res.code,
+					}, {
 						custom: {
 							catch: true,
-							toast: false
 						}
 					});
-					console.log('openid', reslogin);
-					
 					// 获取token
 					const getLogin = await wxLogin({
-						openid: reslogin.openid,
+						openid: reslogin.data.openid,
+					}, {
 						custom: {
 							catch: true,
-							toast: false
+							toast: true,
+							msg: '登录成功'
 						}
 					})
-					
 					// 登录成功
-					if (getLogin.token) {
-						uni.setStorageSync('token', getLogin.token);
+					if (getLogin.code == 1) {
+						uni.setStorageSync('token', getLogin.data.token);
+						
+						const commonData = await getCommonData({}, {
+							custom: {
+								catch: true,
+								token: true
+							}
+						})
+						
+						uni.setStorageSync('commonData', commonData.data);
 						emit('loginHide');
 					}
 				}

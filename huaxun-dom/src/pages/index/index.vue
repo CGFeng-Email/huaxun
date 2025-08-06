@@ -62,9 +62,9 @@
 	<!-- 预约弹窗 -->
 	<uv-modal ref="modal" @confirm="confirm" :showConfirmButton="false">
 		<view class="slot-content modal">
-			<view class="title">预约量房</view>
+			<view class="title">{{subscribeTitle}}</view>
 			<view class="lead">
-				今日已有 <text class="red">{{ subscribeUserNumber }}</text> 位业主成功预约工程师量房
+				今日已有 <text class="red">{{ subscribeUserNumber }}</text> {{subscribeText}}
 			</view>
 			<uv-form labelPosition="left" :model="modalForm" :rules="rules" ref="form">
 				<uv-form-item prop="name">
@@ -98,11 +98,11 @@
 	<view class="scheme">
 		<view class="title">获取家装报价</view>
 		<view class="lead">
-			现已累计有 <uv-count-to :startVal="0" :endVal="106983" duration="3000" color="#D50000" fontSize="36"
+			现已累计有 <uv-count-to :startVal="0" :endVal="quoteNumber" duration="3000" color="#D50000" fontSize="36"
 				bold></uv-count-to> 位客户成功获取
 		</view>
 		<view class="item box_shadow box_radius">
-			<uv-count-to :startVal="0" :endVal="squarePrice" :decimals="2" decimal="." duration="3000" color="#FF4E00"
+			<uv-count-to :startVal="0" :endVal="squarePrice" :decimals="2" decimal="." duration="2000" color="#FF4E00"
 				fontSize="36" bold></uv-count-to>
 			<text class="ide">元</text>
 		</view>
@@ -111,19 +111,17 @@
 				:columns="addressList" keyName="name" @change="pickerChange" @confirm="pickerConfirm">
 			</uv-picker>
 			<view class="picker_text  justify_space">
-				<text class="text">{{ selectValue }}</text>
-				<i class="iconfont icon-xia"></i>
+				<text class="select_address"
+					v-if="selectProvinces || selectCitys">{{ selectProvinces }}/{{selectCitys}}</text>
+				<template v-else>
+					<text class="text">{{ selectValue }}</text>
+					<i class="iconfont icon-xia"></i>
+				</template>
 			</view>
 		</view>
 		<view class="size_box justify_center">
-			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 0 ? 'active' : '']"
-				@click="switchSquare(0, 126387)">80-150㎡</view>
-			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 1 ? 'active' : '']"
-				@click="switchSquare(1, 226387)">150-300㎡</view>
-			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 2 ? 'active' : '']"
-				@click="switchSquare(2, 326387)">300-600㎡</view>
-			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == 3 ? 'active' : '']"
-				@click="switchSquare(3, 426387)">600㎡以上</view>
+			<view :class="['box', 'box_shadow', 'box_radius', squareIndex == index ? 'active' : '']"
+				v-for="(item,index) in areaList" :key="item.name" @click="switchSquare(item,index)">{{item.name}}</view>
 		</view>
 		<view class="item box_shadow box_radius">
 			<uv-input class="input" v-model="mobile" type="number" placeholder="请输入您的手机号码" color="#000"
@@ -134,10 +132,10 @@
 			</uv-input>
 		</view>
 		<view class="btn">
-			<uv-button color="#FF4E00" openType="contact" :customStyle="{
+			<uv-button color="#FF4E00" :customStyle="{
 				height: '100rpx',
 				'line-height': '100rpx'
-			}">
+			}" @click="submitHouseQuote">
 				<view class="sibmit flex">
 					<i class="iconfont icon-Telegram"></i>
 					<text class="text">免费获取报价</text>
@@ -159,7 +157,7 @@
 		</swiper>
 		<view class="case_main img_bg"
 			style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-			<view class="title">“精品案例”</view>
+			<view class="title">“{{caseTitle}}”</view>
 			<swiper class="swiper_main" autoplay @change="caseSwiperChange" :current="caseIndex">
 				<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openCaseDetails">
 					<view class="name">《琉光·雅寓》</view>
@@ -170,28 +168,32 @@
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
 
-	<!-- 团队 -->
+	<!-- 设计团队 -->
 	<view class="teams img_bg"
 		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-		<view class="title">“设计团队”</view>
-		<view class="lead">全国5000+设计师任您选，让您的家焕然一新！</view>
+		<view class="title">“{{designTitle}}”</view>
+		<view class="lead">{{designDescribe}}</view>
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout>
-			<swiper-item class="item justify_space" v-for="(item,index) in 6" :key="index" @click="openDesignDetails">
+			<swiper-item class="item justify_space" v-for="(item,index) in recommendDesignList" :key="index"
+				@click="openDesignDetails">
 				<view class="modia">
-					<image class="cover" src="/static/img/teams_name1.jpg" mode="scaleToFill"></image>
+					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
 				<view class="content">
 					<view class="head">
-						<text class="name">朱炎东</text>
-						<text class="post">总设计师</text>
+						<text class="name">{{item.real_name}}</text>
+						<text class="post">{{item.grade_name}}</text>
 					</view>
 					<view class="lead">
-						从事室内设计行业24年擅长风格：新中式，现代简约风格
+						{{item.remark}}
+					</view>
+					<view class="lead">
+						擅长风格：{{item.style_name}}
 					</view>
 					<view class="list flex">
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
+						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
+						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
+						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
 					</view>
 				</view>
 			</swiper-item>
@@ -218,53 +220,18 @@
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
 
-	<!-- 项目 -->
+	<!-- 工程监管 -->
 	<view class="project img_bg"
 		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-		<view class="title">“工程监控”</view>
-		<view class="sub_head">匠心品质，环保筑家</view>
+		<view class="title">“{{projectTitle}}”</view>
+		<view class="sub_head">{{projectDescribe}}</view>
 		<view class="list">
 			<view class="row flex">
-				<view class="col_md">
+				<view class="col_md" v-for="(item,index) in projectList" :key="item.title">
 					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li1.jpg" mode="scaleToFill"></image>
-						<view class="name">10</view>
-						<view class="lead">10大工程流程管控</view>
-					</view>
-				</view>
-				<view class="col_md">
-					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li2.jpg" mode="scaleToFill"></image>
-						<view class="name">10</view>
-						<view class="lead">6大保障</view>
-					</view>
-				</view>
-				<view class="col_md">
-					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li3.jpg" mode="scaleToFill"></image>
-						<view class="name">500+</view>
-						<view class="lead">验收节点</view>
-					</view>
-				</view>
-				<view class="col_md">
-					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li4.jpg" mode="scaleToFill"></image>
-						<view class="name">20+</view>
-						<view class="lead">国家发明及实用新专利</view>
-					</view>
-				</view>
-				<view class="col_md">
-					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li4.jpg" mode="scaleToFill"></image>
-						<view class="name">环保材料</view>
-						<view class="lead">全球甄选，专业定制</view>
-					</view>
-				</view>
-				<view class="col_md">
-					<view class="item box_radius box_shadow">
-						<image class="cover" src="/static/img/project_li5.jpg" mode="scaleToFill"></image>
-						<view class="name">无忧售后</view>
-						<view class="lead">一次装修，终身维护</view>
+						<image class="cover" :src="item.image" mode="scaleToFill"></image>
+						<view class="name">{{item.number}}+</view>
+						<view class="lead">{{item.title}}</view>
 					</view>
 				</view>
 				<view class="common_more inlineBlock" @click="openProject">查看更多</view>
@@ -276,19 +243,19 @@
 	<!-- 装修案例 -->
 	<view class="decoration_case img_bg"
 		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-		<view class="title">“装修知识”</view>
-		<view class="sub_head">您的装修之旅，从学习装修知识开始</view>
+		<view class="title">“{{decorationTitle}}”</view>
+		<view class="sub_head">{{decorationDescribe}}</view>
 		<swiper class="swiper" autoplay skip-hidden-item-layout circular next-margin="60px">
-			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openKnowledgeDeatails">
+			<swiper-item class="item" v-for="(item,index) in descrationList" :key="index" @click="openKnowledgeDeatails">
 				<view class="box box_radius box_shadow">
 					<view class="modia">
-						<image class="cover" src="/static/img/decoration_li1.jpg" mode="scaleToFill"></image>
+						<image class="cover" :src="item.image" mode="scaleToFill"></image>
 					</view>
 					<view class="lead">
-						轻奢大宅设计，呼之欲出的高级感，越看越心水
+						{{item.title}}
 					</view>
 					<view class="date">
-						2025.06.09
+						{{item.publish_date}}
 					</view>
 				</view>
 			</swiper-item>
@@ -315,35 +282,91 @@
 		ref,
 		computed,
 		onMounted,
-		nextTick
+		nextTick,
 	} from 'vue';
 	import {
 		postBanner,
-		subscribeNumber
+		subscribeNumber,
+		subscribeMeasureTheHouse,
+		getAQuote,
+		homeData,
+		subscribeStylist,
+		caseList,
+		designList,
+		projectStewardList,
+		descrationListApi
 	} from '../../request/api.js';
 
+	const app = getApp();
 	const pageScroll = ref(0);
-	const squareIndex = ref(0);
-	const squarePrice = ref(126387);
+	const squareIndex = ref(0); // 面积下标
+	const squarePrice = ref(126387); // 面积对应的价格
 	const modal = ref(null);
 	const form = ref(null);
 	const picker = ref(null);
 	const modalIndex = ref(0);
 	const login = ref(false);
 	const banner = ref([]);
+	const subscribeTitle = ref(''); // 预约弹窗标题
+	const subscribeText = ref(''); // 预约弹窗描述
 	const subscribePopupIndex = ref(0); // 预约弹窗下标
 	const subscribeUserNumber = ref(0); // 预约弹窗客户预约数量
 	const today_measure_sum = ref(0); // 今日预约量房客户数量
 	const today_quotation_sum = ref(0); // 今日家装报价客户数量
 	const today_designer_sum = ref(0); // 今日预约设计师客户数量
+	// 面积范围
+	const areaList = ref([{
+		name: '80-150㎡',
+		quotation: 126387
+	}, {
+		name: '150-300㎡',
+		quotation: 226387
+	}, {
+		name: '300-600㎡',
+		quotation: 326387
+	}, {
+		name: '600㎡以上',
+		quotation: 426387
+	}])
+	// 家装报价数量
+	const quoteNumber = ref(0);
+	// 家装报价电话
+	const mobile = ref(null);
+	// 案例标题
+	const caseTitle = ref('精品案例');
+	// 设计师列表
+	const recommendDesignList = ref([]);
+	// 设计师标题
+	const designTitle = ref(null);
+	// 设计师描述
+	const designDescribe = ref(null);
+	// 工程管家标题
+	const projectStewardTitle = ref(null);
+	// 工程管家描述
+	const projectStewardDescribe = ref(null);
+	// 工程管家列表
+	const StewardList = ref([]);
+	// 工程标题
+	const projectTitle = ref(null);
+	// 工程描述
+	const projectDescribe = ref(null);
+	// 工程列表
+	const projectList = ref([]);
+	// 装修知识列表
+	const descrationList = ref([]);
+	// 装修标题
+	const decorationTitle = ref(null);
+	// 装修描述
+	const decorationDescribe = ref(null);
 
 	const loginHide = () => {
 		login.value = false;
 	}
 
-	const switchSquare = (index, price) => {
+	// 点击面积范围
+	const switchSquare = (item, index) => {
 		squareIndex.value = index;
-		squarePrice.value = price;
+		squarePrice.value = item.quotation;
 	}
 
 	const rules = ref({
@@ -381,23 +404,98 @@
 		}
 
 		if (index == 0) {
+			subscribeTitle.value = '预约量房';
+			subscribeText.value = '位业主成功预约工程师量房';
 			subscribeUserNumber.value = today_measure_sum.value;
 		} else if (index == 1) {
+			subscribeTitle.value = '获取报价';
+			subscribeText.value = '位业主成功获取报价';
 			subscribeUserNumber.value = today_quotation_sum.value;
 		} else if (index == 2) {
+			subscribeTitle.value = '预约设计师';
+			subscribeText.value = '位业主成功预约设计师';
 			subscribeUserNumber.value = today_designer_sum.value;
 		} else {
-			subscribeUserNumber.value = 0;
+			uni.makePhoneCall({
+				phoneNumber: '114' //仅为示例
+			});
+			subscribePopupIndex.value = index;
+			return;
 		}
 
 		subscribePopupIndex.value = index;
-
 		modal.value.open();
 	}
 
+	// 预约弹窗验证
 	const submit = () => {
-		form.value.validate().then(res => {
-			console.log('res');
+		form.value.validate().then(async res => {
+			console.log('res', res, modalForm.value);
+
+			// 预约量房
+			if (subscribePopupIndex.value == 0) {
+				const honse = await subscribeMeasureTheHouse({
+					real_name: modalForm.value.name,
+					mobile: modalForm.value.mobile
+				}, {
+					custom: {
+						token: true,
+						catch: true,
+						toast: true,
+						msg: '提交成功'
+					}
+				})
+				console.log('honse', honse);
+				if (honse.code == 1) {
+					setTimeout(() => {
+						form.value.resetFields();
+						form.value.clearValidate();
+						modal.value.close();
+					}, 1000)
+				}
+			} else if (subscribePopupIndex.value == 1) {
+				// 获取报价
+				const quote = await getAQuote({
+					real_name: modalForm.value.name,
+					mobile: modalForm.value.mobile
+				}, {
+					custom: {
+						token: true,
+						catch: true,
+						toast: true,
+						msg: '提交成功'
+					}
+				})
+				console.log('quote', quote);
+				if (quote.code == 1) {
+					setTimeout(() => {
+						form.value.resetFields();
+						form.value.clearValidate();
+						modal.value.close();
+					}, 1000)
+				}
+			} else {
+				// 预约设计师
+				const stylist = await subscribeStylist({
+					real_name: modalForm.value.name,
+					mobile: modalForm.value.mobile
+				}, {
+					custom: {
+						token: true,
+						catch: true,
+						toast: true,
+						msg: '提交成功'
+					}
+				})
+				console.log('stylist', stylist);
+				if (stylist.code == 1) {
+					setTimeout(() => {
+						form.value.resetFields();
+						form.value.clearValidate();
+						modal.value.close();
+					}, 1000)
+				}
+			}
 		}).catch(err => {
 			console.log('err');
 		})
@@ -410,6 +508,10 @@
 	const areas = ref([]); // 区
 	const pickerValue = ref([0, 0, 0]); // 选中的
 	const selectValue = ref('请选择城市地址');
+	// 选中的省
+	const selectProvinces = ref(null);
+	// 选中的市区
+	const selectCitys = ref(null);
 
 	const handlePickValueDefault = () => {
 		console.log('regions', regions);
@@ -449,8 +551,50 @@
 		}
 	}
 
+	// 地区联动选择
 	const pickerConfirm = (e) => {
 		console.log('确认选择的地区：', `${e.value[0].name}/${e.value[1].name}/${e.value[2].name}`);
+		selectProvinces.value = e.value[0].name;
+		selectCitys.value = e.value[1].name + '/' + e.value[2].name;
+	}
+
+	// 提交在线报价方案
+	const submitHouseQuote = async () => {
+		const token = uni.getStorageSync('token');
+
+		if (!token) {
+			login.value = true;
+			return;
+		}
+
+		if (!mobile.value) {
+			uni.$uv.toast('请先输入手机号');
+			return;
+		} else {
+			if (uni.$uv.test.mobile(mobile.value)) {
+				const res = await getAQuote({
+					mobile: mobile.value,
+					province: selectProvinces.value,
+					city: selectCitys.value,
+					area_id: areaList.value[squareIndex.value].value
+				}, {
+					custom: {
+						token: true,
+						catch: true,
+						msg: '提交成功',
+						toast: true
+					}
+				})
+				console.log('res', res);
+				if (res.code == 1) {
+					setTimeout(() => {
+						mobile.value = null;
+					}, 1000)
+				}
+			} else {
+				return uni.$uv.toast('请输入正确的手机号');
+			}
+		}
 	}
 
 	// 案例swiper
@@ -523,25 +667,93 @@
 	onMounted(async () => {
 		handlePickValueDefault();
 
-		const bannerList = await postBanner({
+		// banner
+		const bannerList = await postBanner({}, {
 			custom: {
-				catch: true,
-				toast: false
+				catch: true
 			}
 		});
+		banner.value = bannerList.data.lists;
 
-		banner.value = bannerList.lists;
-
-		const getSubscribeNumber = await subscribeNumber({
+		// 各弹窗用户预约数量
+		const getSubscribeNumber = await subscribeNumber({}, {
 			custom: {
-				catch: true,
-				toast: false
+				catch: true
+			}
+		})
+		today_designer_sum.value = getSubscribeNumber.data.today_designer_sum;
+		today_measure_sum.value = getSubscribeNumber.data.today_measure_sum;
+		today_quotation_sum.value = getSubscribeNumber.data.today_quotation_sum;
+
+		// 获取首页数据
+		const getHomeData = await homeData({
+			custom: {
+				catch: true
 			}
 		})
 
-		today_designer_sum.value = getSubscribeNumber.today_designer_sum;
-		today_measure_sum.value = getSubscribeNumber.today_measure_sum;
-		today_quotation_sum.value = getSubscribeNumber.today_quotation_sum;
+		console.log('getHomeData', getHomeData);
+		if (getHomeData.code == 1) {
+			quoteNumber.value = getHomeData.data.quotation_sum;
+			caseTitle.value = getHomeData.data.jingpin_title;
+			designTitle.value = getHomeData.data.design_team_title;
+			designDescribe.value = getHomeData.data.design_team_remark;
+			projectStewardTitle.value = getHomeData.data.engineer_manager_title;
+			projectStewardDescribe.value = getHomeData.data.engineer_manager_remark;
+			projectTitle.value = getHomeData.data.engineer_control_title;
+			projectDescribe.value = getHomeData.data.engineer_control_remark;
+			projectList.value = getHomeData.data.engineer_control_item;
+			decorationTitle.value = getHomeData.data.decoration_skill_title;
+			decorationDescribe.value = getHomeData.data.decoration_skill_remark;
+		}
+
+		// 家装报价面积
+		const token = uni.getStorageSync('token');
+		const commonData = uni.getStorageSync('commonData');
+		console.log('commonData', commonData);
+		if (token) {
+			areaList.value = commonData.area_select;
+		}
+
+		// 推荐案例
+		const recommendCaseList = await caseList({
+			is_jingpin: true
+		}, {
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('recommendCaseList', recommendCaseList);
+
+		// 推荐设计师
+		const getRecommenDesignList = await designList({}, {
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('getRecommenDesignList', getRecommenDesignList);
+		recommendDesignList.value = getRecommenDesignList.data.lists;
+
+		// 工程管家
+		const getProjectStewardList = await projectStewardList({}, {
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('getProjectStewardList', getProjectStewardList);
+
+		// 装修知识
+		const getDescrationList = await descrationListApi({}, {
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('getDescrationList', getDescrationList);
+		descrationList.value = getDescrationList.data.lists;
 	})
 
 	onPageScroll((e) => {
@@ -707,6 +919,12 @@
 				.iconfont {
 					color: #5E5E5E;
 					font-size: 26rpx;
+				}
+
+				.select_address {
+					font-size: 28rpx;
+					font-weight: 500;
+					color: #000;
 				}
 			}
 

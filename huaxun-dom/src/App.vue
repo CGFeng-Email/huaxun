@@ -4,9 +4,9 @@
 
 	export default {
 		globalData: {
-			selected: 0
+			selected: 0,
 		},
-		onLaunch: function() {
+		onLaunch: () => {
 			console.log('App Launch');
 			// 版本更新
 			autoUpdate();
@@ -48,7 +48,7 @@
 		justify-content: space-between;
 		align-items: center;
 	}
-	
+
 	.justify_end {
 		display: flex;
 		align-items: center;
@@ -114,7 +114,7 @@
 	.inlineBlock {
 		display: inline-block;
 	}
-	
+
 	.img_bg {
 		background-size: cover;
 		background-repeat: no-repeat;
@@ -143,11 +143,11 @@
 		font-weight: 500;
 		margin-top: 20rpx;
 	}
-	
+
 	.animate {
 		transform: .4s ease;
 	}
-	
+
 	.red {
 		font-size: 28rpx;
 		font-weight: 600;
