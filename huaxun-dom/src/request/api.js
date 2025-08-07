@@ -10,7 +10,7 @@ export const openId = (params, config = {}) => uni.$uv.http.post('/mini/user/get
 export const wxLogin = (params, config = {}) => uni.$uv.http.post('/mini/user/login', params, config);
 
 // 预约数量
-export const subscribeNumber = (params, config = {}) => uni.$uv.http.post('/mini/page_set/getSubscribe', params,
+export const subscribeNumberApi = (params, config = {}) => uni.$uv.http.post('/mini/page_set/getSubscribe', params,
 	config);
 
 // 退出登录
@@ -35,13 +35,25 @@ export const getCommonData = (params, config = {}) => uni.$uv.http.post('/mini/c
 export const homeData = (data) => uni.$uv.http.get('/mini/page_set/getHome', data);
 
 // 精品案例
-export const caseList = (params, config = {}) => uni.$uv.http.post('/mini/example/getList', params, config);
+export const caseListApi = (params, config = {}) => uni.$uv.http.post('/mini/example/getList', params, config);
 
 // 设计师列表
-export const designList = (params, config = {}) => uni.$uv.http.post('/mini/designer/getList', params, config);
+export const designListApi = (params, config = {}) => uni.$uv.http.post('/mini/designer/getList', params, config);
 
 // 工程管家
-export const projectStewardList = (params, config = {}) => uni.$uv.http.post('/mini/butler/getList', params, config);
+export const projectStewardListApi = (params, config = {}) => uni.$uv.http.post('/mini/butler/getList', params, config);
 
 // 装修知识
 export const descrationListApi = (params, config = {}) => uni.$uv.http.post('/mini/development/getList', params, config);
+
+// 案例详情
+export const caseDetailsApi = (params, config= {}) => uni.$uv.http.post('/mini/example/detail', params, config);
+
+// 案例收藏/取消收藏
+export const isCaseCollectApi = (params, config = {}) => uni.$uv.http.post('/mini/example/setCollect', params, config);
+
+// 设计师详情
+export const designDetailsApi = (params, config = {}) => uni.$uv.http.post('/mini/designer/detail', params, config);
+
+// 设计师收藏
+export const designCollectApi = (params, config = {}) => uni.$uv.http.post('/mini/designer/setCollect', params, config);

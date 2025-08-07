@@ -151,16 +151,17 @@
 	<view class="case_swiper">
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout @change="caseSwiperChange"
 			:current="caseIndex">
-			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openCaseDetails">
-				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
+			<swiper-item class="item" v-for="(item,index) in caseList" :key="index" @click="openCaseDetails(item.id)">
+				<image class="cover" :src="item.image" mode="scaleToFill"></image>
 			</swiper-item>
 		</swiper>
 		<view class="case_main img_bg"
 			style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 			<view class="title">“{{caseTitle}}”</view>
 			<swiper class="swiper_main" autoplay @change="caseSwiperChange" :current="caseIndex">
-				<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openCaseDetails">
-					<view class="name">《琉光·雅寓》</view>
+				<swiper-item class="item" v-for="(item,index) in caseList" :key="index"
+					@click="openCaseDetails(item.id)">
+					<view class="name">{{item.title}}</view>
 				</swiper-item>
 			</swiper>
 			<view class="more" @click="openCase">查看更多案例</view>
@@ -175,7 +176,7 @@
 		<view class="lead">{{designDescribe}}</view>
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout>
 			<swiper-item class="item justify_space" v-for="(item,index) in recommendDesignList" :key="index"
-				@click="openDesignDetails">
+				@click="openDesignDetails(item.id)">
 				<view class="modia">
 					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
@@ -187,13 +188,12 @@
 					<view class="lead">
 						{{item.remark}}
 					</view>
-					<view class="lead">
+					<view class="lead" v-if="item.style_name">
 						擅长风格：{{item.style_name}}
 					</view>
 					<view class="list flex">
-						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
-						<image class="cover" src="/static/img/banner_bg.jpg" mode="widthFix"></image>
+						<image class="cover" :src="item2" mode="widthFix" v-for="(item2, index) in item.images"
+							:key="item2"></image>
 					</view>
 				</view>
 			</swiper-item>
@@ -202,18 +202,18 @@
 	</view>
 	<uv-gap height="20" bgColor="#f8f8f8"></uv-gap>
 
-	<!-- 管家团队 -->
+	<!-- 工程管家 -->
 	<view class="teams img_bg"
 		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-		<view class="title">“工程管家”</view>
-		<view class="lead">让您温馨的家有专属的管家把控</view>
+		<view class="title">“{{projectStewardTitle}}”</view>
+		<view class="lead">{{projectStewardDescribe}}</view>
 		<swiper class="stewoad_swiper" autoplay circular :display-multiple-items="3" skip-hidden-item-layout>
-			<swiper-item class="item" v-for="(item,index) in 6" :key="index" @click="openStewardDetails">
+			<swiper-item class="item" v-for="(item,index) in StewardList" :key="index" @click="openStewardDetails">
 				<view class="modia">
-					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
+					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
-				<view class="name">朱炎东</view>
-				<view class="port inlineBlock">高级管家</view>
+				<view class="name">{{item.real_name}}</view>
+				<view class="port inlineBlock">{{item.grade_name}}</view>
 			</swiper-item>
 		</swiper>
 		<view class="common_more inlineBlock" @click="openSteward">查看更多管家</view>
@@ -246,7 +246,8 @@
 		<view class="title">“{{decorationTitle}}”</view>
 		<view class="sub_head">{{decorationDescribe}}</view>
 		<swiper class="swiper" autoplay skip-hidden-item-layout circular next-margin="60px">
-			<swiper-item class="item" v-for="(item,index) in descrationList" :key="index" @click="openKnowledgeDeatails">
+			<swiper-item class="item" v-for="(item,index) in descrationList" :key="index"
+				@click="openKnowledgeDeatails">
 				<view class="box box_radius box_shadow">
 					<view class="modia">
 						<image class="cover" :src="item.image" mode="scaleToFill"></image>
@@ -286,18 +287,18 @@
 	} from 'vue';
 	import {
 		postBanner,
-		subscribeNumber,
+		subscribeNumberApi,
 		subscribeMeasureTheHouse,
 		getAQuote,
 		homeData,
 		subscribeStylist,
-		caseList,
-		designList,
-		projectStewardList,
+		caseListApi,
+		designListApi,
+		projectStewardListApi,
 		descrationListApi
 	} from '../../request/api.js';
 
-	const app = getApp();
+	const login = ref(false); // 登录弹窗
 	const pageScroll = ref(0);
 	const squareIndex = ref(0); // 面积下标
 	const squarePrice = ref(126387); // 面积对应的价格
@@ -305,7 +306,6 @@
 	const form = ref(null);
 	const picker = ref(null);
 	const modalIndex = ref(0);
-	const login = ref(false);
 	const banner = ref([]);
 	const subscribeTitle = ref(''); // 预约弹窗标题
 	const subscribeText = ref(''); // 预约弹窗描述
@@ -334,6 +334,8 @@
 	const mobile = ref(null);
 	// 案例标题
 	const caseTitle = ref('精品案例');
+	// 案例列表
+	const caseList = ref([]);
 	// 设计师列表
 	const recommendDesignList = ref([]);
 	// 设计师标题
@@ -395,6 +397,7 @@
 		mobile: null
 	})
 
+	// 预约弹窗
 	const openModal = (index) => {
 		const token = uni.getStorageSync('token');
 
@@ -442,7 +445,7 @@
 						token: true,
 						catch: true,
 						toast: true,
-						msg: '提交成功'
+						msg: '预约成功'
 					}
 				})
 				console.log('honse', honse);
@@ -463,7 +466,7 @@
 						token: true,
 						catch: true,
 						toast: true,
-						msg: '提交成功'
+						msg: '预约成功'
 					}
 				})
 				console.log('quote', quote);
@@ -484,7 +487,7 @@
 						token: true,
 						catch: true,
 						toast: true,
-						msg: '提交成功'
+						msg: '预约成功'
 					}
 				})
 				console.log('stylist', stylist);
@@ -603,22 +606,22 @@
 		caseIndex.value = e.detail.current;
 	}
 
-	// 装修知识
-	const decorationList = ref([
-		'/static/img/decoration_li1.jpg',
-		'/static/img/decoration_li1.jpg',
-		'/static/img/decoration_li1.jpg'
-	])
-
 	const openCase = () => {
 		uni.switchTab({
 			url: '/pages/case/index'
 		})
 	}
 
-	const openCaseDetails = () => {
+	const openCaseDetails = (id) => {
+		const token = uni.getStorageSync('token');
+
+		if (!token) {
+			login.value = true;
+			return;
+		}
+		
 		uni.navigateTo({
-			url: '/pages/case/details'
+			url: `/pages/case/details?id=${id}`
 		})
 	}
 
@@ -628,9 +631,9 @@
 		})
 	}
 
-	const openDesignDetails = () => {
+	const openDesignDetails = (id) => {
 		uni.navigateTo({
-			url: '/pages/design/details'
+			url: `/pages/design/details?id=${id}`
 		})
 	}
 
@@ -676,7 +679,7 @@
 		banner.value = bannerList.data.lists;
 
 		// 各弹窗用户预约数量
-		const getSubscribeNumber = await subscribeNumber({}, {
+		const getSubscribeNumber = await subscribeNumberApi({}, {
 			custom: {
 				catch: true
 			}
@@ -716,8 +719,8 @@
 		}
 
 		// 推荐案例
-		const recommendCaseList = await caseList({
-			is_jingpin: true
+		const recommendCaseList = await caseListApi({
+			is_jingpin: 1
 		}, {
 			custom: {
 				catch: true
@@ -725,9 +728,9 @@
 		})
 
 		console.log('recommendCaseList', recommendCaseList);
-
+		caseList.value = recommendCaseList.data.lists;
 		// 推荐设计师
-		const getRecommenDesignList = await designList({}, {
+		const getRecommenDesignList = await designListApi({}, {
 			custom: {
 				catch: true
 			}
@@ -737,13 +740,14 @@
 		recommendDesignList.value = getRecommenDesignList.data.lists;
 
 		// 工程管家
-		const getProjectStewardList = await projectStewardList({}, {
+		const recommendProjectStewardList = await projectStewardListApi({}, {
 			custom: {
 				catch: true
 			}
 		})
 
-		console.log('getProjectStewardList', getProjectStewardList);
+		console.log('recommendProjectStewardList', recommendProjectStewardList);
+		StewardList.value = recommendProjectStewardList.data.lists;
 
 		// 装修知识
 		const getDescrationList = await descrationListApi({}, {

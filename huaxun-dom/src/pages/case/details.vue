@@ -1,49 +1,46 @@
 <template>
 	<Navbar title="案例展馆" :pageScroll="pageScroll"></Navbar>
 	<view class="swiper">
-		<swiper class="banner" autoplay circular skip-hidden-item-layout>
-			<swiper-item>
+		<swiper class="banner" autoplay circular skip-hidden-item-layout indicator-dots
+			indicator-active-color="#FF4E00">
+			<swiper-item v-for="(item,index) in details.images" :key="item">
 				<view class="item">
-					<image class="img" src="/static/img/case_swiper.jpg" mode="scaleToFill"></image>
-				</view>
-			</swiper-item>
-			<swiper-item>
-				<view class="item">
-					<image class="img" src="/static/img/case_swiper.jpg" mode="scaleToFill"></image>
+					<image class="img" :src="item" mode="scaleToFill"></image>
 				</view>
 			</swiper-item>
 		</swiper>
 	</view>
 	<view class="details">
 		<view class="title">
-			长沙润府-轻奢风格-220㎡-四房
+			{{details.title}}
 		</view>
 		<view class="specification flex box_radius box_shadow">
-			<view class="item">
+			<view class="item" v-if="details.place">
 				<text class="name inlineBlock">楼盘</text>
-				<text class="text inlineBlock">长沙润府</text>
+				<text class="text inlineBlock">{{details.place}}</text>
 			</view>
-			<view class="item">
+			<view class="item" v-if="details.style_name">
 				<text class="name inlineBlock">风格</text>
-				<text class="text inlineBlock">现代轻奢</text>
+				<text class="text inlineBlock">{{details.style_name}}</text>
 			</view>
-			<view class="item">
+			<view class="item" v-if="details.house_name">
 				<text class="name inlineBlock">户型</text>
-				<text class="text inlineBlock">四居室</text>
+				<text class="text inlineBlock">{{details.house_name}}</text>
 			</view>
-			<view class="item">
+			<view class="item" v-if="details.area_name">
 				<text class="name inlineBlock">面积</text>
-				<text class="text inlineBlock">220㎡</text>
+				<text class="text inlineBlock">{{details.area_name}}</text>
 			</view>
 		</view>
 		<view class="property justify_center">
 			<view class="click justify_center">
 				<i class="iconfont icon-chakan"></i>
-				<text class="text inlineBlock">533</text>
+				<text class="text inlineBlock">{{details.view_actual || 0}}</text>
 			</view>
-			<view class="click justify_center">
-				<i class="iconfont icon-shoucang"></i>
-				<text class="text inlineBlock">368</text>
+			<view class="click justify_center" @click="isCollect">
+				<i class="iconfont icon-shoucang" v-if="CaseCollect == 0"></i>
+				<i class="iconfont icon-shoucang1 active" v-else></i>
+				<text class="text inlineBlock">{{CaseCollectNumber || 0}}</text>
 			</view>
 		</view>
 		<uv-line margin="10px 0"></uv-line>
@@ -51,60 +48,55 @@
 			设计理念
 		</view>
 		<view class="lead">
-			本案不仅注重空间的美观与实用性，客餐厅采用开放式设计，模糊了传统功能区的界限，强调了空间的流畅性与互动性。
+			{{details.design_idea}}
 		</view>
 		<view class="vr">
-			<view class="cover_box box_radius box_shadow">
-				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
+			<view class="cover_box box_radius box_shadow" @click="previewIde">
+				<image class="cover" :src="details.image" mode="widthFix"></image>
 			</view>
-			<view class="sign justify_center">
+			<view class="sign justify_center" v-if="details.vr_url">
 				<i class="iconfont icon-vr"></i>
 				<text class="text">360全景</text>
 			</view>
 		</view>
 	</view>
-	<view class="case" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+	<view class="case"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');"
+		v-if="details.living_room_images.length > 0">
 		<view class="title">“客厅展示”</view>
-		<view class="cover_box">
-			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
-		</view>
-		<view class="cover_box">
-			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
+		<view class="cover_box" v-for="(item,index) in details.living_room_images" :key="item" @click="previewLivingRoom(index)">
+			<image class="cover" :src="item" mode="widthFix"></image>
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#fff"></uv-gap>
-	<view class="case" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+	<view class="case"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');"
+		v-if="details.main_room_images.length > 0">
 		<view class="title">“主卧展示”</view>
-		<view class="cover_box">
-			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
-		</view>
-		<view class="cover_box">
-			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
+		<view class="cover_box" v-for="(item,index) in details.main_room_images" :key="item" @click="perviewMaster(index)">
+			<image class="cover" :src="item" mode="widthFix"></image>
 		</view>
 	</view>
 	<uv-gap height="20" bgColor="#fff"></uv-gap>
 	<view class="case_swiper">
 		<swiper class="swiper" autoplay circular skip-hidden-item-layout @change="caseSwiperChange"
 			:current="caseIndex">
-			<swiper-item class="item">
-				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
-			</swiper-item>
-			<swiper-item class="item">
-				<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="scaleToFill"></image>
+			<swiper-item class="item" v-for="(item,index) in caseList" :key="index" @click="openCaseDetails(item.id)">
+				<image class="cover" :src="item.image" mode="scaleToFill"></image>
 			</swiper-item>
 		</swiper>
-		<view class="case_main img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+		<view class="case_main img_bg"
+			style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 			<view class="title">“推荐案例”</view>
 			<swiper class="swiper_main" autoplay @change="caseSwiperChange" :current="caseIndex">
-				<swiper-item class="item">
-					<view class="name">《琉光·雅寓》</view>
-				</swiper-item>
-				<swiper-item class="item">
-					<view class="name">《琉光·雅致》</view>
+				<swiper-item class="item" v-for="(item,index) in caseList" :key="index"
+					@click="openCaseDetails(item.id)">
+					<view class="name">{{item.title}}</view>
 				</swiper-item>
 			</swiper>
 		</view>
 	</view>
+
 	<view class="consult justify_space">
 		<view class="left justify_center">
 			<view class="logo justify_center">
@@ -145,19 +137,31 @@
 
 <script setup>
 	import Navbar from '@/component/navbar';
-	
+
 	import {
-		onPageScroll
+		onPageScroll,
+		onLoad
 	} from '@dcloudio/uni-app';
-	
+
 	import {
-		ref
+		ref,
+		onMounted
 	} from 'vue';
 
+	import {
+		caseDetailsApi,
+		isCaseCollectApi,
+		caseListApi
+	} from '../../request/api.js';
+
+	const id = ref(null); // 案例id
+	const caseList = ref([]); // 推荐案例
+	const details = ref({}); // 详情
+	const CaseCollect = ref(0); // 是否收藏
+	const CaseCollectNumber = ref(0); // 收藏数量
 	// 案例swiper
 	const caseIndex = ref(0);
 	const caseSwiperChange = (e) => {
-		console.log(e);
 		caseIndex.value = e.detail.current;
 	}
 
@@ -171,6 +175,101 @@
 		uni.makePhoneCall({
 			phoneNumber: '17520583947' //仅为示例
 		});
+	}
+
+	// 收藏
+	const isCollect = async () => {
+		uni.showLoading({
+			title: '加载中',
+			mask: true
+		});
+
+		const res = await isCaseCollectApi({
+			id: id.value,
+			type: CaseCollect.value == 0 ? 1 : 0
+		}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		})
+		console.log('isCollect', res);
+		if (res.code == 1) {
+			CaseCollect.value = CaseCollect.value == 0 ? 1 : 0;
+			if (CaseCollect.value == 1) {
+				CaseCollectNumber.value = CaseCollectNumber.value += 1;
+			} else {
+				CaseCollectNumber.value = CaseCollectNumber.value -= 1;
+			}
+		}
+		uni.hideLoading();
+	}
+
+	// 推荐案例
+	const openCaseDetails = (id) => {
+		uni.navigateTo({
+			url: `/pages/case/details?id=${id}`
+		})
+	}
+
+	onLoad(async (load) => {
+		console.log('load', load);
+
+		if (load.id) {
+			id.value = load.id;
+			const res = await caseDetailsApi({
+				id: id.value
+			}, {
+				custom: {
+					catch: true,
+					token: true
+				}
+			})
+
+			details.value = res.data;
+			CaseCollect.value = res.data.is_collect;
+			CaseCollectNumber.value = res.data.collect_num;
+			console.log('caseDetails', res);
+		}
+
+		// 推荐案例
+		const recommendCaseList = await caseListApi({
+			is_jingpin: 1
+		}, {
+			custom: {
+				catch: true
+			}
+		})
+
+		caseList.value = recommendCaseList.data.lists;
+	})
+
+	// 设计理念预览
+	const previewIde = () => {
+		const list = [];
+		list.push(details.value.image);
+		uni.previewImage({
+			showmenu: true,
+			urls: list
+		})
+	}
+	
+	// 客厅展示预览
+	const previewLivingRoom = (index) => {
+		uni.previewImage({
+			current: index,
+			showmenu: true,
+			urls: details.value.living_room_images
+		})
+	}
+	
+	// 主卧展示预览
+	const perviewMaster = (index) => {
+		uni.previewImage({
+			current: index,
+			showmenu: true,
+			urls: details.value.main_room_images
+		})
 	}
 </script>
 
@@ -226,6 +325,10 @@
 					margin-right: 10rpx;
 					color: #777777;
 					font-weight: 500;
+				}
+
+				.active {
+					color: $main-color;
 				}
 
 				.text {

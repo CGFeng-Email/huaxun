@@ -4,28 +4,28 @@
 		<image class="bg_cover" src="/static/img/banner_bg.jpg" mode="scaleToFill"></image>
 		<view class="info flex">
 			<view class="head_portrait">
-				<image class="cover" src="/static/img/teams_name1.jpg" mode="widthFix"></image>
+				<image class="cover" :src="details.image" mode="widthFix"></image>
 			</view>
 			<view class="content">
 				<view class="head">
-					<text class="name inlineBlock">朱炎东</text>
-					<text class="text inlineBlock">总设计师</text>
+					<text class="name inlineBlock">{{details.real_name}}</text>
+					<text class="text inlineBlock">{{details.grade_name}}</text>
 				</view>
 				<view class="lead justify_center">
 					<text class="name">服务指数：</text>
-					<uv-rate :count="5" v-model="recommend" activeColor="#FF4E00" size="24" readonly
+					<uv-rate :count="5" v-model="details.service_index" activeColor="#FF4E00" size="24" readonly
 						activeIcon="heart-fill" inactiveIcon="heart"></uv-rate>
 				</view>
-				<view class="lead">
+				<view class="lead" v-if="details.service_place">
 					<text class="name">服务地区：</text>
-					<text class="text">全国</text>
+					<text class="text">{{details.service_place}}</text>
 				</view>
 				<view class="lead">
-					从事室内设计行业24年
+					{{details.remark}}
 				</view>
 				<view class="lead">
 					<text class="name">擅长风格：</text>
-					<text class="text">新中式，现代简约风格</text>
+					<text class="text">{{details.style_name}}</text>
 				</view>
 			</view>
 		</view>
@@ -39,63 +39,42 @@
 			<view class="item">
 				<view class="title">个人资质</view>
 				<view class="lead">
-					H A 艺墅设计院佛山院
-				</view>
-				<view class="lead">
-					华浔品味装饰集团佛山公司 | 设计总监
-				</view>
-				<view class="lead">
-					CIDA中国室内装饰协会会员
-				</view>
-				<view class="lead">
-					国家注册高级室内设计师（中装协）
-				</view>
-				<view class="lead">
-					湖南理工大学
+					<uv-parse :selectable="true" :lazyLoad="true" :content="details.qualification"></uv-parse>
 				</view>
 			</view>
 			<view class="item">
 				<view class="title">设计理念</view>
 				<view class="lead">
-					让艺术和生活零距离，用设计诠释生活，用灵感点亮生活。
+					{{details.design_idea}}
 				</view>
 			</view>
 			<view class="item">
 				<view class="title">工作获奖经历</view>
 				<view class="lead">
-					SADI建筑装饰协会“最佳创意奖” <br>
-					2016年进修“齐云生活美学馆”大师班 <br>
-					2016年华浔品味装饰集团百变空间“优秀奖” <br>
-					2019年中国建筑装饰CIDF华鼎奖 “银奖” <br>
-					第五届金马克室内设计大赛别墅方案类 “优秀奖” <br>
-					2020-2024年华浔品味装饰集团佛山大区年度 “优秀设计师” <br>
-					华浔品味装饰集团 年度“全国金牌设计师” <br>
-					第七届金马克室内设计大赛别墅实景类 “TOP100” <br>
-					2024年佛山大区设计享未来设计大赛别墅大宅方案类“金奖” <br>
-					2024设计-山海经年度优秀单空间设计奖 <br>
-					曾游学于：希腊、英国、意大利、西班牙、葡萄牙、新西兰、泰国等
+					<uv-parse :selectable="true" :lazyLoad="true" :content="details.award"></uv-parse>
 				</view>
 			</view>
 		</view>
 		<view class="tabs_item" v-else>
-			<view v-for="(item, index) in 4" :key="index" class="waterfall-item box_radius box_shadow">
+			<view v-for="(item, index) in caseList" :key="index" class="waterfall-item box_radius box_shadow">
 				<view class="waterfall-item__image">
-					<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
+					<image class="cover" :src="item.image" mode="widthFix"></image>
 				</view>
 				<view class="content">
 					<view class="title">
-						长沙润府-轻奢风格-220㎡-四房
+						{{item.title}}
+					</view>
+					<view class="lead">
+						{{item.design_idea}}
 					</view>
 					<view class="bottom justify_space">
 						<view class="label_list">
-							<text class="text inlineBlock box_radius box_shadow">现代轻奢</text>
-							<text class="text inlineBlock box_radius box_shadow">四居室</text>
-							<text class="text inlineBlock box_radius box_shadow">220</text>
+							<text class="text inlineBlock box_radius box_shadow">{{item.style_name}}</text>
 						</view>
 						<view class="property justify_space">
 							<view class="click justify_center">
 								<i class="iconfont icon-chakan"></i>
-								<text class="text">568</text>
+								<text class="text">{{item.view_actual}}</text>
 							</view>
 						</view>
 					</view>
@@ -107,8 +86,9 @@
 	<view class="make justify_space">
 		<view class="content justify_center">
 			<view class="item">
-				<view class="icon">
-					<i class="iconfont inlineBlock icon-shoucang"></i>
+				<view class="icon" @click="isCollect">
+					<i class="iconfont inlineBlock icon-shoucang" v-if="designCollect"></i>
+					<i class="iconfont inlineBlock icon-shoucang1" v-else></i>
 				</view>
 				<view class="lead">
 					收藏
@@ -139,7 +119,7 @@
 		<view class="slot-content modal">
 			<view class="title">预约设计</view>
 			<view class="lead">
-				今日已有66位业主成功预约设计师
+				今日已有 <text class="red">{{ subscribeUserNumber }}</text> 位业主成功预约设计师
 			</view>
 			<uv-form labelPosition="left" :model="modalForm" :rules="rules" ref="form">
 				<uv-form-item prop="name">
@@ -157,9 +137,9 @@
 					<text>信息保护中，请放心填写</text>
 				</view>
 				<uv-button color="#FF4E00" @click="submit">
-					<view class="sibmit flex">
+					<view class="sibmit justify_center">
 						<i class="iconfont icon-Telegram"></i>
-						<text class="text">提交提交</text>
+						<text class="text">确认提交</text>
 					</view>
 				</uv-button>
 				<view class="describe">
@@ -172,19 +152,34 @@
 
 <script setup>
 	import Navbar from '@/component/navbar';
+
 	import {
 		ref
 	} from 'vue';
+
 	import {
+		onLoad,
 		onPageScroll
 	} from '@dcloudio/uni-app';
 
+	import {
+		designDetailsApi,
+		caseListApi,
+		designCollectApi,
+		subscribeNumberApi,
+		subscribeStylist
+	} from '../../request/api.js';
+
+	const id = ref(null);
 	const recommend = ref(4);
 	const tabsIndex = ref(0);
 	const pageScroll = ref(0);
-
 	const modal = ref(null);
 	const form = ref(null);
+	const details = ref({});
+	const caseList = ref([]);
+	const designCollect = ref(0); // 是否收藏
+	const subscribeUserNumber = ref(0); // 预约设计师数量
 
 	const rules = ref({
 		'name': {
@@ -217,15 +212,101 @@
 	}
 
 	const submit = () => {
-		form.value.validate().then(res => {
+		form.value.validate().then(async (res) => {
 			console.log('res');
+			// 预约设计师
+			const stylist = await subscribeStylist({
+				real_name: modalForm.value.name,
+				mobile: modalForm.value.mobile
+			}, {
+				custom: {
+					token: true,
+					catch: true,
+					toast: true,
+					msg: '预约成功'
+				}
+			})
+			console.log('stylist', stylist);
+			if (stylist.code == 1) {
+				setTimeout(() => {
+					form.value.resetFields();
+					form.value.clearValidate();
+					modal.value.close();
+				}, 1000)
+			}
 		}).catch(err => {
 			console.log('err');
 		})
 	}
 
+	// 收藏、取消收藏
+	const isCollect = async () => {
+		uni.showLoading({
+			title: '加载中',
+			mask: true
+		});
+
+		const res = await designCollectApi({
+			id: id.value,
+			type: designCollect.value == 0 ? 1 : 0
+		}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		})
+
+		if (res.code == 1) {
+			designCollect.value = designCollect.value == 0 ? 1 : 0;
+		}
+
+		uni.hideLoading();
+	}
+
 	onPageScroll((e) => {
 		pageScroll.value = e.scrollTop;
+	})
+
+	onLoad(async (load) => {
+		console.log('load', load);
+		if (load.id) {
+			id.value = load.id;
+
+			// 设计师详情
+			const res = await designDetailsApi({
+				id: id.value
+			}, {
+				custom: {
+					catch: true,
+					token: true
+				}
+			})
+
+			console.log('designDeatails', res);
+			details.value = res.data;
+			designCollect.value = res.data.is_collect;
+
+			// 设计师案例
+			const getCaseList = await caseListApi({
+				designer_id: id.value
+			}, {
+				custom: {
+					catch: true
+				}
+			})
+
+			console.log('getCaseList', getCaseList);
+			caseList.value = getCaseList.data.lists;
+
+			// // 各弹窗用户预约数量
+			const getSubscribeNumber = await subscribeNumberApi({}, {
+				custom: {
+					catch: true
+				}
+			})
+			subscribeUserNumber.value = getSubscribeNumber.data.today_designer_sum;
+
+		}
 	})
 </script>
 
@@ -258,6 +339,8 @@
 
 				.cover {
 					width: 250rpx;
+					height: 250rpx;
+					border-radius: 50%;
 				}
 			}
 
@@ -346,7 +429,7 @@
 			margin-top: 30rpx;
 			border-radius: 6px;
 			padding: 20rpx;
-			
+
 			.waterfall-item__image {
 				.cover {
 					width: 750rpx;
@@ -355,6 +438,10 @@
 
 			.content {
 				padding: 20rpx 0 0;
+
+				.lead {
+					margin-bottom: 10rpx;
+				}
 
 				.label_list {
 					.text {
@@ -368,7 +455,7 @@
 				.title {
 					font-size: 28rpx;
 					font-weight: 600;
-					margin-bottom: 20rpx;
+					margin-bottom: 10rpx;
 				}
 
 				.click {
