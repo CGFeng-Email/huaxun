@@ -1,5 +1,5 @@
 <template>
-	<view class="static" :style="'top:'+offsetTop+'px'" :index="index">
+	<view class="static" :style="'top:'+offsetTop+'px'">
 		<view class="tabs_box justify_center">
 			<view class="item justify_space">
 				<view class="name">{{title}}</view>
@@ -36,7 +36,7 @@
 			type: Array,
 			default: () => []
 		},
-		index: {
+		type: {
 			type: Number,
 			default: () => 1
 		},
@@ -61,8 +61,9 @@
 	const click = (e) => {
 		console.log(e);
 		emit('tabsClick', {
-			index: props.index,
-			e
+			type: props.type,
+			value: e.value,
+			index: e.index
 		});
 	}
 </script>

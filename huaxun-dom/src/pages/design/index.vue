@@ -1,8 +1,8 @@
 <template>
 	<Search></Search>
-	<Tabs :index="1" title="极品" :list="rankList" :offsetTop="-1" :currentIndex="rankIndex" @tabsClick="tabsClick">
+	<Tabs :type="1" title="等级" :list="gradeList" :offsetTop="0" :currentIndex="gradeIndex" @tabsClick="tabsClick">
 	</Tabs>
-	<Tabs :index="2" title="风格" :list="styleList" :offsetTop="45" :currentIndex="styleIndex" @tabsClick="tabsClick">
+	<Tabs :type="2" title="风格" :list="styleList" :offsetTop="45" :currentIndex="styleIndex" @tabsClick="tabsClick">
 	</Tabs>
 	<view class="list">
 		<view class="item box_radius box_shadow" v-for="(item,index) in 7" :key="index" @click="openDetails">
@@ -35,49 +35,92 @@
 	import Search from '@/component/search';
 	import Tabs from '@/component/tabs';
 	import Tabbar from '@/component/tabbar';
+
 	import {
-		ref
+		ref,
+		onMounted
 	} from 'vue';
 
-	const rankIndex = ref(0);
-	const rankList = ref([{
-			name: '总设计师'
-		},
-		{
-			name: '设计总监'
-		}, {
-			name: '主案设计师'
-		}, {
-			name: '设计师'
-		}
-	])
+	import {
+		onReachBottom
+	} from '@dcloudio/uni-app';
 
-	const styleIndex = ref(0);
-	const styleList = ref([{
-			name: '现代简约'
-		},
-		{
-			name: '现代轻奢'
-		}, {
-			name: '中式'
-		}, {
-			name: '欧式风'
-		}, {
-			name: '简欧式风'
-		}, {
-			name: '复古'
-		}
-	])
+	import {
+		designListApi
+	} from '../../request/api.js';
+
+	// 等级
+	const gradeList = ref([]);
+	const gradeIndex = ref(null);
+	// 风格
+	const styleList = ref([]);
+	const styleIndex = ref(null);
+	const size = ref(10);
+	const page = ref(0);
+	const totalPage = ref(0);
+	const status = ref('loadmore');
+	const rankIndex = ref(0);
 
 	const tabsClick = (e) => {
-		console.log('tabs-click', e);
+		if (e.type == 1) {
+			if (gradeIndex.value == e.index) {
+				gradeIndex.value = null;
+			} else {
+				gradeIndex.value = e.index;
+			}
+		} else if (e.type == 2) {
+			if (styleIndex.value == e.index) {
+				styleIndex.value = null;
+			} else {
+				styleIndex.value = e.index;
+			}
+		}
+
+		getDesignList()
 	}
-	
+
 	const openDetails = () => {
 		uni.navigateTo({
 			url: '/pages/design/details'
 		})
 	}
+
+	const getDesignList = async (more) => {
+		if (!more) {
+			page.value = 1;
+		}
+
+		const res = await designListApi({
+			page: page.value,
+			size: size.value,
+			grade_id: gradeIndex.value != null ? gradeList.value[gradeIndex.value].value : '',
+			style_id: styleIndex.value != null ? styleList.value[styleIndex.value].value : ''
+		}, {
+			custom: {
+				catch: true
+			}
+		});
+
+		console.log('designDetails', res);
+	}
+
+	onMounted(() => {
+		const commonData = uni.getStorageSync('commonData');
+		gradeList.value = commonData.designer_grade_select;
+		styleList.value = commonData.style_select;
+
+		getDesignList()
+	})
+	
+	onReachBottom(() => {
+		if (page.value >= totalPage.value) {
+			status.value = 'nomore';
+		} else {
+			status.value = 'loading';
+			page.value++;
+			getCaseList(true);
+		}
+	})
 </script>
 
 <style>

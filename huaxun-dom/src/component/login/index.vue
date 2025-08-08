@@ -34,7 +34,7 @@
 	} from 'vue';
 
 	const emit = defineEmits(['loginHide']);
-	
+
 	import {
 		openId,
 		wxLogin,
@@ -111,17 +111,9 @@
 					// 登录成功
 					if (getLogin.code == 1) {
 						uni.setStorageSync('token', getLogin.data.token);
-						
-						const commonData = await getCommonData({}, {
-							custom: {
-								catch: true,
-								token: true
-							}
-						})
-						
-						uni.setStorageSync('commonData', commonData.data);
-						emit('loginHide');
 					}
+					
+					emit('loginHide');
 				}
 			}
 		});

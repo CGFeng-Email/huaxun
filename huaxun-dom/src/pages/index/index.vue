@@ -208,7 +208,7 @@
 		<view class="title">“{{projectStewardTitle}}”</view>
 		<view class="lead">{{projectStewardDescribe}}</view>
 		<swiper class="stewoad_swiper" autoplay circular :display-multiple-items="3" skip-hidden-item-layout>
-			<swiper-item class="item" v-for="(item,index) in StewardList" :key="index" @click="openStewardDetails">
+			<swiper-item class="item" v-for="(item,index) in StewardList" :key="index" @click="openStewardDetails(item.id)">
 				<view class="modia">
 					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
@@ -247,7 +247,7 @@
 		<view class="sub_head">{{decorationDescribe}}</view>
 		<swiper class="swiper" autoplay skip-hidden-item-layout circular next-margin="60px">
 			<swiper-item class="item" v-for="(item,index) in descrationList" :key="index"
-				@click="openKnowledgeDeatails">
+				@click="openKnowledgeDeatails(item.id)">
 				<view class="box box_radius box_shadow">
 					<view class="modia">
 						<image class="cover" :src="item.image" mode="scaleToFill"></image>
@@ -279,12 +279,14 @@
 	import {
 		onPageScroll
 	} from '@dcloudio/uni-app';
+	
 	import {
 		ref,
 		computed,
 		onMounted,
 		nextTick,
 	} from 'vue';
+	
 	import {
 		postBanner,
 		subscribeNumberApi,
@@ -298,6 +300,7 @@
 		descrationListApi
 	} from '../../request/api.js';
 
+	const app = getApp();
 	const login = ref(false); // 登录弹窗
 	const pageScroll = ref(0);
 	const squareIndex = ref(0); // 面积下标
@@ -605,13 +608,16 @@
 	const caseSwiperChange = (e) => {
 		caseIndex.value = e.detail.current;
 	}
-
+	
+	// 案例列表
 	const openCase = () => {
+		app.globalData.selected = 1;
 		uni.switchTab({
 			url: '/pages/case/index'
 		})
 	}
-
+	
+	// 案例详情
 	const openCaseDetails = (id) => {
 		const token = uni.getStorageSync('token');
 
@@ -624,28 +630,40 @@
 			url: `/pages/case/details?id=${id}`
 		})
 	}
-
+	
+	// 设计师列表
 	const openDesign = () => {
+		app.globalData.selected = 3;
 		uni.switchTab({
 			url: '/pages/design/index'
 		})
 	}
-
+	
+	// 设计师详情
 	const openDesignDetails = (id) => {
 		uni.navigateTo({
 			url: `/pages/design/details?id=${id}`
 		})
 	}
-
+	
+	// 管家列表
 	const openSteward = () => {
 		uni.navigateTo({
 			url: '/pages/steward/index'
 		})
 	}
+	
+	// 管家详情
+	const openStewardDetails = (id) => {
+		const token = uni.getStorageSync('token');
 
-	const openStewardDetails = () => {
+		if (!token) {
+			login.value = true;
+			return;
+		}
+		
 		uni.navigateTo({
-			url: '/pages/steward/details'
+			url: `/pages/steward/details?id=${id}`
 		})
 	}
 
@@ -660,10 +678,11 @@
 			url: '/pages/knowledge/index'
 		})
 	}
-
-	const openKnowledgeDeatails = () => {
+	
+	// 装修知识详情
+	const openKnowledgeDeatails = (id) => {
 		uni.navigateTo({
-			url: '/pages/knowledge/details'
+			url: `/pages/knowledge/details?id=${id}`
 		})
 	}
 

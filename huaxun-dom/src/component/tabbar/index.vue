@@ -25,12 +25,14 @@
 </template>
 
 <script setup>
+	
 	import {
 		ref,
 		onMounted
 	} from 'vue';
 
 	let selected = ref(0);
+	
 	const list = ref([{
 			pagePath: "/pages/index/index",
 			iconfont: 'icon-shouye1',
@@ -65,6 +67,7 @@
 		// 获取全局应用实例
 		const app = getApp();
 		selected.value = app.globalData.selected;
+		console.log('selected.value', selected.value);
 	})
 
 	const switchTab = (e, index) => {

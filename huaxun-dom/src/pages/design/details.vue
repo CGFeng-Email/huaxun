@@ -56,7 +56,7 @@
 			</view>
 		</view>
 		<view class="tabs_item" v-else>
-			<view v-for="(item, index) in caseList" :key="index" class="waterfall-item box_radius box_shadow">
+			<view v-for="(item, index) in caseList" :key="index" class="waterfall-item box_radius box_shadow" @click="openCaseDetails(item.id)">
 				<view class="waterfall-item__image">
 					<image class="cover" :src="item.image" mode="widthFix"></image>
 				</view>
@@ -262,6 +262,12 @@
 
 		uni.hideLoading();
 	}
+	
+	const openCaseDetails = (id) => {
+		uni.navigateTo({
+			url: `/pages/case/details?id=${id}`
+		})
+	}
 
 	onPageScroll((e) => {
 		pageScroll.value = e.scrollTop;
@@ -298,7 +304,7 @@
 			console.log('getCaseList', getCaseList);
 			caseList.value = getCaseList.data.lists;
 
-			// // 各弹窗用户预约数量
+			// 各弹窗用户预约数量
 			const getSubscribeNumber = await subscribeNumberApi({}, {
 				custom: {
 					catch: true

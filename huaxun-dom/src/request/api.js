@@ -44,10 +44,11 @@ export const designListApi = (params, config = {}) => uni.$uv.http.post('/mini/d
 export const projectStewardListApi = (params, config = {}) => uni.$uv.http.post('/mini/butler/getList', params, config);
 
 // 装修知识
-export const descrationListApi = (params, config = {}) => uni.$uv.http.post('/mini/development/getList', params, config);
+export const descrationListApi = (params, config = {}) => uni.$uv.http.post('/mini/development/getList', params,
+config);
 
 // 案例详情
-export const caseDetailsApi = (params, config= {}) => uni.$uv.http.post('/mini/example/detail', params, config);
+export const caseDetailsApi = (params, config = {}) => uni.$uv.http.post('/mini/example/detail', params, config);
 
 // 案例收藏/取消收藏
 export const isCaseCollectApi = (params, config = {}) => uni.$uv.http.post('/mini/example/setCollect', params, config);
@@ -57,3 +58,9 @@ export const designDetailsApi = (params, config = {}) => uni.$uv.http.post('/min
 
 // 设计师收藏
 export const designCollectApi = (params, config = {}) => uni.$uv.http.post('/mini/designer/setCollect', params, config);
+
+// 管家详情
+export const stewardDetailsApi = (params, config = {}) => uni.$uv.http.post('/mini/butler/detail', params, config);
+
+// 装修知识详情
+export const knowledgeDetailsApi = (params, config = {}) => uni.$uv.http.post('/mini/development/detail', params, config);

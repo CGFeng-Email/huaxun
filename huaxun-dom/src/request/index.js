@@ -14,41 +14,41 @@ export const Request = (vm) => {
 		if (config.custom?.token) {
 			const token = uni.getStorageSync('token');
 			if (!token) {
-				return Promise.reject(config);
+				return config;
 			} else {
 				config.data.token = token;
 			}
 		}
 		return config;
 	}, config => {
-		return Promise.reject(config)
+		return Promise.reject(config);
 	})
 
 	// 响应拦截
 	uni.$uv.http.interceptors.response.use((response) => {
 		/* 对响应成功做点什么 可使用async await 做异步操作*/
 		const data = response.data;
-		
+
 		// 自定义参数
 		const custom = response.config?.custom;
-		
+
 		// 响应成功
 		if (response.statusCode == 200) {
 			// 提示
 			if (custom?.toast == true) {
 				uni.$uv.toast(custom.msg);
 			}
-			
+
 			// 返回
 			if (custom?.catch) {
 				return data;
-				
+
 			} else {
 				// 否则返回一个pending中的promise，请求不会进入catch中
 				return new Promise(() => {})
 			}
 		}
-		
+
 		return data.data === undefined ? {} : data.data;
 	}, (response) => {
 		// 对响应错误做点什么 （statusCode !== 200）

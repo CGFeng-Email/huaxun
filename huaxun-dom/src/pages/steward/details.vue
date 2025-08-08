@@ -5,57 +5,35 @@
 		<image class="bg_cover" src="/static/img/case_main_bg.jpg" mode="scaleToFill"></image>
 		<view class="content flex_center">
 			<view class="head_portrait">
-				<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
+				<image class="cover" :src="details.image" mode="scaleToFill"></image>
 			</view>
 			<view class="name">
-				朱炎东
+				{{details.real_name}}
 			</view>
 			<view class="label">
-				<text class="text inlineBlock box_radius">高级管家</text>
+				<text class="text inlineBlock box_radius">{{details.grade_name}}</text>
 			</view>
 		</view>
 	</view>
 
 	<view class="body">
 		<view class="tabs_item">
-			<view class="item">
+			<view class="item" v-if="details.qualification">
 				<view class="title">个人资质</view>
 				<view class="lead">
-					H A 艺墅设计院佛山院
-				</view>
-				<view class="lead">
-					华浔品味装饰集团佛山公司 | 设计总监
-				</view>
-				<view class="lead">
-					CIDA中国室内装饰协会会员
-				</view>
-				<view class="lead">
-					国家注册高级室内设计师（中装协）
-				</view>
-				<view class="lead">
-					湖南理工大学
+					<uv-parse :selectable="true" :lazyLoad="true" :content="details.qualification"></uv-parse>
 				</view>
 			</view>
-			<view class="item">
+			<view class="item" v-if="details.design_idea">
 				<view class="title">设计理念</view>
 				<view class="lead">
-					让艺术和生活零距离，用设计诠释生活，用灵感点亮生活。
+					{{details.design_idea}}
 				</view>
 			</view>
-			<view class="item">
+			<view class="item" v-if="details.award">
 				<view class="title">工作获奖经历</view>
 				<view class="lead">
-					SADI建筑装饰协会“最佳创意奖” <br>
-					2016年进修“齐云生活美学馆”大师班 <br>
-					2016年华浔品味装饰集团百变空间“优秀奖” <br>
-					2019年中国建筑装饰CIDF华鼎奖 “银奖” <br>
-					第五届金马克室内设计大赛别墅方案类 “优秀奖” <br>
-					2020-2024年华浔品味装饰集团佛山大区年度 “优秀设计师” <br>
-					华浔品味装饰集团 年度“全国金牌设计师” <br>
-					第七届金马克室内设计大赛别墅实景类 “TOP100” <br>
-					2024年佛山大区设计享未来设计大赛别墅大宅方案类“金奖” <br>
-					2024设计-山海经年度优秀单空间设计奖 <br>
-					曾游学于：希腊、英国、意大利、西班牙、葡萄牙、新西兰、泰国等
+					<uv-parse :selectable="true" :lazyLoad="true" :content="details.award"></uv-parse>
 				</view>
 			</view>
 		</view>
@@ -64,8 +42,9 @@
 	<view class="make justify_space">
 		<view class="content justify_center">
 			<view class="item">
-				<view class="icon">
-					<i class="iconfont inlineBlock icon-shoucang"></i>
+				<view class="icon" @click="isCollect">
+					<i class="iconfont inlineBlock icon-shoucang" v-if="designCollect"></i>
+					<i class="iconfont inlineBlock icon-shoucang1" v-else></i>
 				</view>
 				<view class="lead">
 					收藏
@@ -129,16 +108,27 @@
 
 <script setup>
 	import Navbar from '@/component/navbar';
-	
+
 	import {
 		ref
 	} from 'vue';
+
 	import {
+		onLoad,
 		onPageScroll
 	} from '@dcloudio/uni-app';
 
+	import {
+		stewardDetailsApi,
+		subscribeMeasureTheHouse
+	} from '../../request/api.js';
+
+	const id = ref(null);
 	const modal = ref(null);
 	const form = ref(null);
+	const stewardCollect = ref(0);
+	const details = ref({});
+	const subscribeUserNumber = ref(0);
 
 	const rules = ref({
 		'name': {
@@ -183,6 +173,61 @@
 	onPageScroll((e) => {
 		if (e.scrollTop > 300) return;
 		pageScroll.value = e.scrollTop;
+	})
+	
+	// 收藏、取消收藏
+	const isCollect = async () => {
+		uni.showLoading({
+			title: '加载中',
+			mask: true
+		});
+	
+		const res = await designCollectApi({
+			id: id.value,
+			type: designCollect.value == 0 ? 1 : 0
+		}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		})
+	
+		if (res.code == 1) {
+			designCollect.value = designCollect.value == 0 ? 1 : 0;
+		}
+	
+		uni.hideLoading();
+	}
+
+	onLoad(async (load) => {
+		console.log('load', load);
+
+		if (load.id) {
+			id.value = load.id;
+
+			// 管家详情
+			const res = await stewardDetailsApi({
+				id: id.value
+			}, {
+				custom: {
+					catch: true,
+					token: true
+				}
+			})
+
+			console.log('stewardDeatails', res);
+			details.value = res.data;
+			stewardCollect.value = res.data.is_collect;
+			
+			// 各弹窗用户预约数量
+			const getSubscribeNumber = await subscribeNumberApi({}, {
+				custom: {
+					catch: true
+				}
+			})
+			subscribeUserNumber.value = getSubscribeNumber.data.today_measure_sum;
+			
+		}
 	})
 </script>
 

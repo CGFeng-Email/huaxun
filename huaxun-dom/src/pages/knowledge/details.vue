@@ -1,20 +1,21 @@
 <template>
 	<Navbar title="装修知识" :pageScroll="pageScroll"></Navbar>
 	<view class="banner">
-		<image class="cover" src="/static/img/case_swiper.jpg" mode="widthFix"></image>
+		<image class="cover" :src="details.image" mode="widthFix"></image>
 	</view>
 	<view class="main">
 		<view class="title">
-			轻奢大宅设计，呼之欲出的高级感，越看越心水
+			{{details.title}}
 		</view>
 		<view class="author">
-			<text class="text">时间：2025.06.09</text>
-			<text class="text">来源：华浔装饰</text>
+			<text class="text">时间：{{details.publish_date}}</text>
+			<text class="text">来源：{{details.source}}</text>
 		</view>
 		<view class="lead">
-			广东华浔品味装饰集团有限公司成立于1998年，是一家集全案设计、整装服务、配套材料、集成施工和定制服务于一体的大型直营连锁装饰集团，主要从事家居、写字楼、商铺、酒店等空间的设计与施工，同时还提供教育培训、家居建材供应、生态木制品生产加工、家居商城服务等上下游产业链配套服务。
-
-			2003年，华浔率先通过ISO9001国际质量体系认证。目前已取得了专项设计乙级资质、专项施工壹级资质，是中国建筑装饰协会副会长单位，中国家居行业品质建设成就理事会副理事长单位，全国各省市建筑装饰行业协会会长/副会长单位。
+			<uv-parse :selectable="true" :lazyLoad="true" :content="details.content" :tagStyle="{
+				p: 'color: #000; font-size: 28rpx; line-height: 1.8;',
+				img: 'margin: 10rpx 0;'
+			}"></uv-parse>
 		</view>
 		<view class="cover_box">
 			<image class="cover" src="/static/img/case_swiper_li1.jpg" mode="widthFix"></image>
@@ -36,7 +37,7 @@
 			<view class="wrap justify_center">
 				<i class="iconfont inlineBlock icon-chakan"></i>
 				<view class="text">
-					533
+					{{details.view_actual}}
 				</view>
 			</view>
 		</view>
@@ -45,14 +46,23 @@
 
 <script setup>
 	import Navbar from '@/component/navbar';
+
 	import {
 		ref
 	} from 'vue';
+
 	import {
-		onPageScroll
+		onPageScroll,
+		onLoad
 	} from '@dcloudio/uni-app';
 
+	import {
+		knowledgeDetailsApi
+	} from '../../request/api.js';
+
+	const id = ref(null);
 	const pageScroll = ref(0);
+	const details = ref({});
 
 	const returnClick = () => {
 		uni.navigateBack()
@@ -60,6 +70,25 @@
 
 	onPageScroll((e) => {
 		pageScroll.value = e.scrollTop;
+	})
+
+	onLoad(async (load) => {
+		console.log('load', load);
+		if (load.id) {
+			id.value = load.id;
+
+			const res = await knowledgeDetailsApi({
+				id: id.value
+			}, {
+				custom: {
+					catch: true,
+					token: true
+				}
+			})
+
+			console.log('knowledgeDetails', res);
+			details.value = res.data;
+		}
 	})
 </script>
 

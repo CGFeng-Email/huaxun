@@ -1,15 +1,19 @@
 <script>
 	// 版本更新
 	import autoUpdate from '@/hooks/update.js';
+	
+	import {
+		getCommonData
+	} from './request/api.js';
 
 	export default {
 		globalData: {
 			selected: 0,
 		},
-		onLaunch: () => {
+		onLaunch: async () => {
 			console.log('App Launch');
 			// 版本更新
-			autoUpdate();
+			await autoUpdate();
 
 			// 获取胶囊坐标
 			const getMenuButton = uni.getStorageSync('menuButton');
@@ -18,6 +22,15 @@
 				const res = uni.getMenuButtonBoundingClientRect();
 				uni.setStorageSync('menuButton', res);
 			}
+			
+			// 公共数据
+			const commonData = await getCommonData({}, {
+				custom: {
+					catch: true,
+				}
+			})
+			uni.setStorageSync('commonData', commonData.data);
+			
 		},
 		onShow: function() {},
 		onHide: function() {},
