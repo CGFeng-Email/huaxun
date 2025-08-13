@@ -345,8 +345,6 @@
 
 				.cover {
 					width: 250rpx;
-					height: 250rpx;
-					border-radius: 50%;
 				}
 			}
 

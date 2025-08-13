@@ -4,39 +4,48 @@
 		<image class="cover" src="https://project-1317202885.cos.ap-guangzhou.myqcloud.com/me_bg.jpg" mode="widthFix">
 		</image>
 	</view>
-	<view class="user justify_center">
+	<view class="user justify_center" @click="openPersonalData">
 		<view class="head_portrait justify_center">
-			<image class="cover" src="/static/img/head_portrait.png" mode="scaleToFill"></image>
+			<image class="cover" :src="userData.avatar || '/static/img/head_portrait.png'" mode="widthFix"></image>
 			<view class="content">
-				<view class="name">游客</view>
+				<view class="name">{{userData.nickname || '游客'}}</view>
 				<view class="mobile justify_center">
 					<i class="iconfont icon-shouji"></i>
-					<text class="phone">-</text>
+					<text class="phone">{{userData.mobile || '-'}}</text>
 				</view>
 			</view>
 		</view>
-		<view class="set justify_center" @click="openPersonalData">
+		<view class="set justify_center">
 			<i class="iconfont icon-shezhi"></i>
 			<text class="text">个人资料</text>
 		</view>
 	</view>
 	<view class="collect_list flex">
 		<view class="item" @click="openCaseCollect">
-			<uv-count-to color="#fff" fontSize="38" bold :startVal="0" :endVal="3"></uv-count-to>
+			<uv-count-to color="#fff" fontSize="38" bold :startVal="0"
+				:endVal="userData.example_collect || 0"></uv-count-to>
 			<view class="name">案例收藏</view>
 		</view>
 		<view class="item" @click="openDesignCollect">
-			<uv-count-to color="#fff" fontSize="38" bold :startVal="0" :endVal="6"></uv-count-to>
+			<uv-count-to color="#fff" fontSize="38" bold :startVal="0"
+				:endVal="userData.designer_collect || 0"></uv-count-to>
 			<view class="name">设计师收藏</view>
 		</view>
 		<view class="item" @click="openStewardCollect">
-			<uv-count-to color="#fff" fontSize="38" bold :startVal="0" :endVal="12"></uv-count-to>
+			<uv-count-to color="#fff" fontSize="38" bold :startVal="0"
+				:endVal="userData.butler_collect || 0"></uv-count-to>
 			<view class="name">管家收藏</view>
 		</view>
 	</view>
-	<view class="advertising">
-		<image class="cover box_radius box_shadow" src="/static/img/advertising.jpg" mode="widthFix"></image>
-	</view>
+
+	<swiper class="advertising" autoplay circular skip-hidden-item-layout>
+		<swiper-item class="item" v-for="item in banner" :key="item.id">
+			<view class="cover">
+				<image class="cover box_radius box_shadow" :src="item.thumb" mode="widthFix"></image>
+			</view>
+		</swiper-item>
+	</swiper>
+
 	<view class="platform">
 		<view class="wrap">
 			<view class="title">平台相关</view>
@@ -82,7 +91,7 @@
 						联系信息
 					</view>
 				</view>
-				<view class="item" @click="loginExit">
+				<view class="item" @click="loginExit" v-if="token">
 					<view class="icon">
 						<i class="iconfont icon-tuichu"></i>
 					</view>
@@ -94,6 +103,9 @@
 		</view>
 	</view>
 
+	<!-- 登录 -->
+	<Login :show="login" @loginHide="loginHide"></Login>
+
 	<!-- 退出登录弹窗 -->
 	<uv-modal ref="modalExit" title="退出" content='确定要退出当前账户吗？' align="center" :zoom="true" :asyncClose="true"
 		:showCancelButton="true" @confirm="loginExitConfirm" confirmColor="#FF4E00"></uv-modal>
@@ -102,25 +114,41 @@
 </template>
 
 <script setup>
-	import Tabbar from '@/component/tabbar/index.vue';
+	import Tabbar from '@/component/tabbar';
 	import Navbar from '@/component/navbar';
+
 	import {
-		ref
+		ref,
+		onMounted
 	} from 'vue';
+
 	import {
+		onShow,
 		onPageScroll
 	} from '@dcloudio/uni-app';
 
 	import {
-		logOut
+		logOut,
+		userDataApi,
+		postBanner,
+		aboutUsApi
 	} from '../../request/api.js';
+	import {
+		string
+	} from '../../uni_modules/uv-ui-tools/libs/function/test.js';
 
-	const pageScroll = ref(0);
+	// 登录弹窗
+	const login = ref(false);
 	const modalExit = ref(null);
+	const token = ref(null);
+	const userData = ref({});
+	const pageScroll = ref(0);
+	const banner = ref([]);
+	const mobile = ref(null);
 
 	const makeCall = () => {
 		uni.makePhoneCall({
-			phoneNumber: '17520583947' //仅为示例
+			phoneNumber: mobile.value + ''
 		});
 	}
 
@@ -137,33 +165,43 @@
 	}
 
 	const openCaseCollect = () => {
+		if (!token.value) return login.value = true;
 		uni.navigateTo({
 			url: '/pages/case/collect',
 		})
 	}
 
 	const openDesignCollect = () => {
+		if (!token.value) return login.value = true;
 		uni.navigateTo({
 			url: '/pages/design/collect'
 		})
 	}
 
 	const openStewardCollect = () => {
+		if (!token.value) return login.value = true;
 		uni.navigateTo({
 			url: '/pages/steward/collect'
 		})
 	}
 
+	// 用户资料
 	const openPersonalData = () => {
-		uni.navigateTo({
-			url: '/pages/me/personalData'
-		})
+		if (!token.value) {
+			login.value = true;
+		} else {
+			uni.navigateTo({
+				url: '/pages/me/personalData'
+			})
+		}
 	}
 
+	// 退出登录弹窗
 	const loginExit = () => {
 		modalExit.value.open();
 	}
 
+	// 确认退出登录
 	const loginExitConfirm = async () => {
 
 		const res = await logOut({
@@ -172,17 +210,82 @@
 				catch: true
 			}
 		})
+
 		console.log('res', res);
 
 		if (res.code == 1) {
 			// 清楚本地缓存
-			uni.clearStorageSync();
+			uni.removeStorageSync('token');
+			token.value = null;
 			modalExit.value.close();
+			userData.value = {};
+			uni.switchTab({
+				url: '/pages/me/index'
+			})
+		}
+	}
+
+	// 登录弹窗，关闭回调
+	const loginHide = (e) => {
+		if (e.isLogin) {
+			token.value = uni.getStorageSync('token');
+			getUserData();
+		}
+
+		login.value = false;
+	}
+
+	// 获取用户信息
+	const getUserData = async () => {
+		const res = await userDataApi({}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		});
+
+		console.log('userData', res);
+		if (res.code == 1) {
+			userData.value = res.data;
 		}
 	}
 
 	onPageScroll((e) => {
 		pageScroll.value = e.scrollTop;
+	})
+
+	onMounted(async () => {
+		// banner
+		const bannerList = await postBanner({
+			pos_type: 2
+		}, {
+			custom: {
+				catch: true
+			}
+		});
+
+		console.log('banner', bannerList);
+		if (bannerList.code == 1) {
+			banner.value = bannerList.data.lists;
+		}
+
+		// 关于我们
+		const aboutUs = await aboutUsApi({
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('aboutUs', aboutUs);
+		if (aboutUs.code == 1) {
+			mobile.value = aboutUs.data.contact_phone;
+		}
+	})
+
+	onShow(() => {
+		token.value = uni.getStorageSync('token');
+		if (!token.value) return;
+		getUserData();
 	})
 </script>
 
@@ -213,8 +316,9 @@
 
 			.cover {
 				width: 116rpx;
-				height: 116rpx;
 				flex: none;
+				border-radius: 50%;
+				overflow: hidden;
 			}
 
 			.content {
@@ -288,7 +392,9 @@
 	}
 
 	.advertising {
-		padding: 20rpx;
+		margin: 20rpx 0;
+		height: 288rpx;
+		padding: 0 20rpx;
 
 		.cover {
 			width: 100%;

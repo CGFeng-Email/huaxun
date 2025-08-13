@@ -1,202 +1,138 @@
 <template>
 	<Navbar title="工程管家" :pageScroll="pageScroll"></Navbar>
+
 	<view class="banner">
-		<image class="cover" src="/static/img/project_banner.jpg" mode="widthFix"></image>
+		<image class="cover" :src="details.control_image" mode="widthFix"></image>
 	</view>
+
 	<view class="flow img_bg" style="background: url(/static/img/project_bg.jpg);">
 		<view class="head flex_center">
-			<uv-count-to :startVal="0" :endVal="10" color="#FF4E00" fontSize="56" bold></uv-count-to>
-			<text class="title">大流程管控</text>
+			<uv-count-to :startVal="0" :endVal="details.process_control_number" color="#FF4E00" fontSize="56"
+				bold></uv-count-to>
+			<text class="title">{{details.process_control_title}}</text>
 		</view>
 		<view class="sub_head">
-			更规范的施工管理，更快的工程交付能力
+			{{details.process_control_remark}}
 		</view>
-		<swiper class="swiper" autoplay :current="currentIndex" :interval="8000" :display-multiple-items="2"
-			skip-hidden-item-layout circular next-margin="40px" @change="swiperChange">
-			<swiper-item :class="['item', 'animate',currentIndex == 0 ? 'active' : '']">
-				<view class="box justify_center">
-					<text class="num">1</text>
-					<text class="text over1">基础验收及保护工程</text>
-				</view>
-			</swiper-item>
-			<swiper-item :class="['item', 'animate',currentIndex == 1 ? 'active' : '']">
-				<view class="box justify_center">
-					<text class="num">2</text>
-					<text class="text over1">泥工基础工程</text>
-				</view>
-			</swiper-item>
-			<swiper-item :class="['item', 'animate',currentIndex == 2 ? 'active' : '']">
-				<view class="box justify_center">
-					<text class="num">3</text>
-					<text class="text over1">墙面找平及室内防水工程</text>
-				</view>
-			</swiper-item>
-		</swiper>
-		<swiper class="swiper_body" :current="currentIndex" :interval="8000" autoplay skip-hidden-item-layout circular
+		<swiper class="swiper" :current="currentIndex" :display-multiple-items="2" skip-hidden-item-layout circular
 			next-margin="40px" @change="swiperChange">
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<view class="cover_box">
-						<image class="cover" src="/static/img/flow_li1.jpg" mode="scaleToFill"></image>
-					</view>
-					<view class="lead">
-						基础验收及保护工程
-					</view>
+			<swiper-item :class="['item', 'animate', currentIndex == index ? 'active' : '']"
+				v-for="(item,index) in details.process_control_list" :key="item.title" @click="swiperClick(index)">
+				<view class="box justify_center">
+					<text class="num">{{index + 1}}</text>
+					<text class="text over1">{{item.title}}</text>
 				</view>
 			</swiper-item>
-			<swiper-item class="item">
+		</swiper>
+		<swiper class="swiper_body" :interval="8000" autoplay skip-hidden-item-layout circular next-margin="40px">
+			<swiper-item class="item" v-for="(item,index) in details.process_control_list[currentIndex].list"
+				:key="item.title" @click="previewImg(index)">
 				<view class="box box_radius box_shadow">
 					<view class="cover_box">
-						<image class="cover" src="/static/img/flow_li1.jpg" mode="scaleToFill"></image>
+						<image class="cover" :src="item.image" mode="scaleToFill"></image>
 					</view>
 					<view class="lead">
-						泥工基础工程
-					</view>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<view class="cover_box">
-						<image class="cover" src="/static/img/flow_li1.jpg" mode="scaleToFill"></image>
-					</view>
-					<view class="lead">
-						墙面找平及室内防水工程
+						{{item.remark}}
 					</view>
 				</view>
 			</swiper-item>
 		</swiper>
 	</view>
-	<view class="safeguard img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+	<view class="safeguard img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
-			<uv-count-to :startVal="0" :endVal="6" color="#FF4E00" fontSize="56" bold></uv-count-to>
-			<text class="title">大保障</text>
+			<uv-count-to :startVal="0" :endVal="details.engineer_guard_number" color="#FF4E00" fontSize="56"
+				bold></uv-count-to>
+			<text class="title">{{details.engineer_guard_title}}</text>
 		</view>
 		<view class="sub_head">
-			保障更到位，省心更放心
+			{{details.engineer_guard_remark}}
 		</view>
-		<swiper class="swiper" :interval="8000" autoplay skip-hidden-item-layout circular next-margin="120px">
-			<swiper-item class="item">
+		<swiper class="swiper" :interval="5000" autoplay skip-hidden-item-layout circular next-margin="120px">
+			<swiper-item class="item" v-for="(item,index) in details.engineer_guard_list" :key="item.title">
 				<view class="box box_radius box_shadow">
 					<view class="cover_box">
-						<image class="cover" src="/static/img/safeguard_li1.jpg" mode="scaleToFill"></image>
+						<image class="cover" :src="item.image" mode="scaleToFill"></image>
 					</view>
 					<view class="content">
 						<image class="bg" src="/static/img/safeguard_content.png" mode="scaleToFill"></image>
 						<view class="wrap justify_space">
-							<text class="num">01</text>
-							<text class="name">不漏水</text>
-						</view>
-					</view>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<view class="cover_box">
-						<image class="cover" src="/static/img/safeguard_li1.jpg" mode="scaleToFill"></image>
-					</view>
-					<view class="content">
-						<image class="bg" src="/static/img/safeguard_content.png" mode="scaleToFill"></image>
-						<view class="wrap justify_space">
-							<text class="num">02</text>
-							<text class="name">不漏水</text>
-						</view>
-					</view>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<view class="cover_box">
-						<image class="cover" src="/static/img/safeguard_li1.jpg" mode="scaleToFill"></image>
-					</view>
-					<view class="content">
-						<image class="bg" src="/static/img/safeguard_content.png" mode="scaleToFill"></image>
-						<view class="wrap justify_space">
-							<text class="num">03</text>
-							<text class="name">不漏水</text>
+							<text class="num">0{{index+1}}</text>
+							<text class="name">{{item.title}}</text>
 						</view>
 					</view>
 				</view>
 			</swiper-item>
 		</swiper>
 	</view>
-	<view class="honor img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+
+	<!-- 证书 -->
+	<view class="honor img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
-			<uv-count-to :startVal="0" :endVal="20" color="#FF4E00" fontSize="56" bold></uv-count-to>
-			<text class="title">余项国家发明及实用新型专利</text>
+			<uv-count-to :startVal="0" :endVal="details.invention_patent_number" color="#FF4E00" fontSize="56"
+				bold></uv-count-to>
+			<text class="title">{{details.invention_patent_title}}</text>
 		</view>
 		<view class="sub_head">
-			专利加持，给您更美好的生活体验
+			{{details.invention_patent_remark}}
 		</view>
-		<swiper class="swiper" :interval="8000" autoplay skip-hidden-item-layout circular :display-multiple-items="2"
+		<swiper class="swiper" :interval="5000" autoplay skip-hidden-item-layout circular :display-multiple-items="2"
 			next-margin="60px">
-			<swiper-item class="item">
+			<swiper-item class="item" v-for="(item,index) in details.invention_patent_list" :key="item.image">
 				<view class="box box_radius box_shadow">
-					<image class="cover" src="/static/img/honor_li1.jpg" mode="scaleToFill"></image>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<image class="cover" src="/static/img/honor_li1.jpg" mode="scaleToFill"></image>
-				</view>
-			</swiper-item>
-			<swiper-item class="item">
-				<view class="box box_radius box_shadow">
-					<image class="cover" src="/static/img/honor_li1.jpg" mode="scaleToFill"></image>
+					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
 			</swiper-item>
 		</swiper>
 	</view>
-	<view class="project_cover">
-		<image class="cover" src="/static/img/project_cover.jpg" mode="widthFix"></image>
-	</view>
-	<view class="serve img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+
+	<!-- 质量 -->
+	<swiper class="project_cover" :interval="5000" autoplay skip-hidden-item-layout circular>
+		<swiper-item class="item" v-for="(item,index) in details.quality_image" :key="item.image">
+			<view class="box box_radius box_shadow">
+				<image class="cover" :src="item" mode="scaleToFill"></image>
+			</view>
+		</swiper-item>
+	</swiper>
+
+	<view class="serve img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
 		<view class="head flex_center">
-			<text class="num">一次装修</text>
-			<text class="title">终身维护</text>
+			<text class="num">{{details.guarantee_left_title}}</text>
+			<text class="title">{{details.guarantee_right_title}}</text>
 		</view>
 		<view class="serve_list">
 			<view class="item">
-				<image class="cover" src="/static/img/serve_li1.jpg" mode="widthFix"></image>
+				<image class="cover" :src="details.guarantee_image" mode="widthFix"></image>
 				<view class="title">
 					全国联保
 				</view>
 			</view>
-			<view class="box flex">
+
+			<view class="box flex" v-for="(item,index) in details.sale_service_list" :key="item.title">
 				<view class="content">
-					<i class="iconfont icon-31dianpu"></i>
+					<view class="icon">
+						<image class="cover" :src="item.image" mode="widthFix"></image>
+					</view>
 					<view class="title">
-						回访活动
+						{{item.title}}
 					</view>
 					<view class="lead">
-						每年不定期开展客户回访活动，为客户提供贴心、高效的售后服务
+						{{item.remark}}
 					</view>
 				</view>
 				<view class="cover_box">
-					<image class="cover" src="/static/img/serve_li2.jpg" mode="scaleToFill"></image>
-				</view>
-			</view>
-			<view class="box flex">
-				<view class="content">
-					<i class="iconfont icon-31dianpu"></i>
-					<view class="title">
-						客服贴心服务
-					</view>
-					<view class="lead">
-						售后客服专员贴心为您解答交付后遇到的困扰，给您更满意的装修体验。
-					</view>
-				</view>
-				<view class="cover_box">
-					<image class="cover" src="/static/img/serve_li3.jpg" mode="scaleToFill"></image>
+					<image class="cover" :src="item.icon" mode="scaleToFill"></image>
 				</view>
 			</view>
 		</view>
 	</view>
-	<view class="form img_bg" style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
-		<view class="modal box_radius box_shadow">
+	
+	<view class="form img_bg"
+		style="background-image: url('https://project-1317202885.cos.ap-guangzhou.myqcloud.com/case_main_bg.jpg');">
+		<view class="modal slot-content box_radius box_shadow">
 			<view class="title">预约全屋装修</view>
-			<view class="lead">
-				今日已有66位业主成功获取报价
-			</view>
 			<uv-form labelPosition="left" :model="modalForm" :rules="rules" ref="form">
 				<uv-form-item prop="name">
 					<uv-input v-model="modalForm.name" placeholder="请输入您的姓名" suffixIcon="account" fontSize="13px"
@@ -224,23 +160,58 @@
 			</uv-form>
 		</view>
 	</view>
+	
+	<!-- 登录 -->
+	<Login :show="login" @loginHide="loginHide" :placeHeight="false"></Login>
 </template>
 
 <script setup>
 	import Navbar from '@/component/navbar';
+
 	import {
-		ref
+		ref,
+		onMounted
 	} from 'vue';
+
 	import {
 		onPageScroll
 	} from '@dcloudio/uni-app';
 
+	import {
+		projectDetailsApi,
+		getAQuote
+	} from '../../request/api.js';
+	
+	const login = ref(false);
 	const currentIndex = ref(0);
 	const pageScroll = ref(0);
 	const form = ref(null);
+	const details = ref({});
 
 	const swiperChange = (e) => {
 		currentIndex.value = e.detail.current
+	}
+
+	const swiperClick = (e) => {
+		currentIndex.value = e;
+	}
+
+	const previewImg = (index) => {
+		uni.showLoading({
+			title: '加载中',
+			mask: true
+		});
+
+		const list = details.value.process_control_list[currentIndex.value].list.map(item => {
+			return item.image
+		})
+
+		uni.previewImage({
+			current: index,
+			urls: list
+		})
+
+		uni.hideLoading();
 	}
 
 	const rules = ref({
@@ -270,15 +241,64 @@
 	})
 
 	const submit = () => {
-		form.value.validate().then(res => {
+		form.value.validate().then(async res => {
 			console.log('res');
+			
+			const token = uni.getStorageSync('token');
+			
+			if (!token) {
+				login.value = true;
+				return;
+			}
+			
+			const subscribe = await getAQuote({
+				real_name: modalForm.value.name,
+				mobile: modalForm.value.mobile
+			}, {
+				custom: {
+					catch: true,
+					token: true,
+					toast: true,
+					msg: '预约成功'
+				}
+			})
+			
+			console.log('subscribe', subscribe);
+			if(subscribe.code == 1) {
+				setTimeout(() => {
+					form.value.resetFields();
+					form.value.clearValidate();
+					modal.value.close();
+				}, 1000)
+			}
 		}).catch(err => {
 			console.log('err');
 		})
 	}
+	
+	const loginHide = () => {
+		login.value = false;
+	}
 
 	onPageScroll((e) => {
 		pageScroll.value = e.scrollTop;
+	})
+
+	const getProjectData = async () => {
+		const res = await projectDetailsApi({
+			custom: {
+				catch: true
+			}
+		})
+
+		console.log('projectDetails', res);
+		if (res.code == 1) {
+			details.value = res.data
+		}
+	}
+
+	onMounted(() => {
+		getProjectData();
 	})
 </script>
 
@@ -485,8 +505,11 @@
 	}
 
 	.project_cover {
+		height: 1200rpx;
+
 		.cover {
 			width: 100%;
+			height: 1200rpx;
 		}
 	}
 
@@ -533,6 +556,12 @@
 				height: 280rpx;
 				background: #fff;
 				margin-bottom: 20rpx;
+
+				.icon {
+					.cover {
+						width: 32rpx;
+					}
+				}
 
 				.content {
 					flex: 1;
@@ -616,6 +645,10 @@
 				text-align: center;
 				color: #989898;
 				padding: 20rpx 0;
+			}
+
+			::v-deep .uv-form-item__body__right__message {
+				margin-left: 0 !important;
 			}
 		}
 	}

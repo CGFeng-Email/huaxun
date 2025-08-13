@@ -276,6 +276,7 @@
 	import Tabbar from '@/component/tabbar/index.vue';
 	import ToBottomAnimate from '@/component/toBottomAnimate/index.vue';
 	import regions from '@/static/json/regions.json';
+	
 	import {
 		onPageScroll
 	} from '@dcloudio/uni-app';
@@ -297,7 +298,8 @@
 		caseListApi,
 		designListApi,
 		projectStewardListApi,
-		descrationListApi
+		descrationListApi,
+		aboutUsApi
 	} from '../../request/api.js';
 
 	const app = getApp();
@@ -335,6 +337,8 @@
 	const quoteNumber = ref(0);
 	// 家装报价电话
 	const mobile = ref(null);
+	// 拨打客服电话号码
+	const phoneNumber = ref(null);
 	// 案例标题
 	const caseTitle = ref('精品案例');
 	// 案例列表
@@ -423,7 +427,7 @@
 			subscribeUserNumber.value = today_designer_sum.value;
 		} else {
 			uni.makePhoneCall({
-				phoneNumber: '114' //仅为示例
+				phoneNumber: phoneNumber.value + '' //仅为示例
 			});
 			subscribePopupIndex.value = index;
 			return;
@@ -690,7 +694,9 @@
 		handlePickValueDefault();
 
 		// banner
-		const bannerList = await postBanner({}, {
+		const bannerList = await postBanner({
+			pos_type: 1
+		}, {
 			custom: {
 				catch: true
 			}
@@ -777,6 +783,18 @@
 
 		console.log('getDescrationList', getDescrationList);
 		descrationList.value = getDescrationList.data.lists;
+		
+		// 关于我们
+		const aboutUs = await aboutUsApi({
+			custom: {
+				catch: true
+			}
+		})
+		
+		console.log('aboutUs', aboutUs);
+		if (aboutUs.code == 1) {
+			phoneNumber.value = aboutUs.data.contact_phone;
+		}
 	})
 
 	onPageScroll((e) => {

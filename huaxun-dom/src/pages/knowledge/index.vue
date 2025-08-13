@@ -1,17 +1,14 @@
 <template>
 	<Search></Search>
 	<view class="list">
-		<view class="item box_radius box_shadow flex" v-for="(item,index) in 10" :key="index" @click="openDetails">
-			<image class="cover box_radius box_shadow" src="/static/img/case_li2.jpg" mode="scaleToFill"></image>
+		<view class="item box_radius box_shadow flex" v-for="(item,index) in knowledgeList" :key="index" @click="openDetails(item.id)">
+			<image class="cover box_radius box_shadow" :src="item.image" mode="scaleToFill"></image>
 			<view class="content">
 				<view class="title over2">
-					轻奢大宅设计，呼之欲出的高级感，越看越心水
+					{{item.title}}
 				</view>
 				<view class="date">
-					2025.06.09
-				</view>
-				<view class="lead over2">
-					坚守“诚信、专业、创新、共享”的经营理念，不断打造“责任、敬业、感恩...
+					{{item.publish_date}}
 				</view>
 			</view>
 		</view>
@@ -20,12 +17,76 @@
 
 <script setup>
 	import Search from '@/component/search';
+
+	import {
+		onMounted,
+		ref
+	} from 'vue';
 	
-	const openDetails = () => {
+	import {
+		onReachBottom
+	} from '@dcloudio/uni-app';
+
+	import {
+		descrationListApi
+	} from '../../request/api.js';
+
+	const size = ref(10);
+	const page = ref(1);
+	const totalPage = ref(0);
+	const status = ref('loadmore');
+	const knowledgeList = ref([]);
+
+	const openDetails = (id) => {
 		uni.navigateTo({
-			url: '/pages/knowledge/details'
+			url: `/pages/knowledge/details?id=${id}`
 		})
 	}
+
+	const getKnowledgeList = async (more) => {
+		if (!more) {
+			page.value = 1;
+			knowledgeList.value = [];
+		}
+
+		const res = await descrationListApi({
+			page: page.value,
+			size: size.value
+		}, {
+			custom: {
+				catch: true
+			}
+		});
+
+		console.log('knowledgeList', res);
+
+		if (res.code == 1) {
+			if (more) {
+				knowledgeList.value = [...knowledgeList.value, res.data.lists];
+				status.value = 'loadmore';
+			} else {
+				knowledgeList.value = res.data.lists;
+				totalPage.value = res.data.page_no;
+				if (totalPage.value <= 1) {
+					status.value = 'nomore';
+				}
+			}
+		}
+	}
+
+	onMounted(() => {
+		getKnowledgeList();
+	})
+
+	onReachBottom(() => {
+		if (page.value >= totalPage.value) {
+			status.value = 'nomore';
+		} else {
+			status.value = 'loading';
+			page.value++;
+			getKnowledgeList(true);
+		}
+	})
 </script>
 
 <style>
@@ -36,7 +97,7 @@
 
 <style lang="scss" scoped>
 	.list {
-		padding: 20rpx;
+		padding: 20rpx 20rpx 40rpx;
 
 		.item {
 			margin-bottom: 20rpx;

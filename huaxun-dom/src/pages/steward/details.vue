@@ -43,7 +43,7 @@
 		<view class="content justify_center">
 			<view class="item">
 				<view class="icon" @click="isCollect">
-					<i class="iconfont inlineBlock icon-shoucang" v-if="designCollect"></i>
+					<i class="iconfont inlineBlock icon-shoucang" v-if="stewardCollect == 0"></i>
 					<i class="iconfont inlineBlock icon-shoucang1" v-else></i>
 				</view>
 				<view class="lead">
@@ -75,7 +75,7 @@
 		<view class="slot-content modal">
 			<view class="title">预约管家</view>
 			<view class="lead">
-				今日已有66位业主成功预约管家
+				今日已有 <text class="red">{{subscribeUserNumber}}</text> 位业主成功预约管家
 			</view>
 			<uv-form labelPosition="left" :model="modalForm" :rules="rules" ref="form">
 				<uv-form-item prop="name">
@@ -120,14 +120,19 @@
 
 	import {
 		stewardDetailsApi,
-		subscribeMeasureTheHouse
+		subscribeMeasureTheHouse,
+		stewardCollectApi,
+		subscribeNumberApi,
+		subscribeStewardApi
 	} from '../../request/api.js';
 
 	const id = ref(null);
 	const modal = ref(null);
 	const form = ref(null);
+	// 是否收藏
 	const stewardCollect = ref(0);
 	const details = ref({});
+	// 预约管家客户数量
 	const subscribeUserNumber = ref(0);
 
 	const rules = ref({
@@ -161,8 +166,29 @@
 	}
 
 	const submit = () => {
-		form.value.validate().then(res => {
+		form.value.validate().then(async res => {
 			console.log('res');
+
+			const subscribe = await subscribeStewardApi({
+				real_name: modalForm.value.name,
+				mobile: modalForm.value.mobile
+			}, {
+				custom: {
+					catch: true,
+					token: true,
+					toast: true,
+					msg: '预约成功'
+				}
+			})
+
+			console.log('subscribe', subscribe);
+			if (subscribe.code == 1) {
+				setTimeout(() => {
+					form.value.resetFields();
+					form.value.clearValidate();
+					modal.value.close();
+				}, 1000)
+			}
 		}).catch(err => {
 			console.log('err');
 		})
@@ -174,28 +200,28 @@
 		if (e.scrollTop > 300) return;
 		pageScroll.value = e.scrollTop;
 	})
-	
+
 	// 收藏、取消收藏
 	const isCollect = async () => {
 		uni.showLoading({
 			title: '加载中',
 			mask: true
 		});
-	
-		const res = await designCollectApi({
+
+		const res = await stewardCollectApi({
 			id: id.value,
-			type: designCollect.value == 0 ? 1 : 0
+			type: stewardCollect.value == 0 ? 1 : 0
 		}, {
 			custom: {
 				catch: true,
 				token: true
 			}
 		})
-	
+
 		if (res.code == 1) {
-			designCollect.value = designCollect.value == 0 ? 1 : 0;
+			stewardCollect.value = stewardCollect.value == 0 ? 1 : 0;
 		}
-	
+
 		uni.hideLoading();
 	}
 
@@ -216,17 +242,22 @@
 			})
 
 			console.log('stewardDeatails', res);
-			details.value = res.data;
-			stewardCollect.value = res.data.is_collect;
-			
+			if (res.code == 1) {
+				details.value = res.data;
+				stewardCollect.value = res.data.is_collect;
+			}
+
 			// 各弹窗用户预约数量
 			const getSubscribeNumber = await subscribeNumberApi({}, {
 				custom: {
 					catch: true
 				}
 			})
-			subscribeUserNumber.value = getSubscribeNumber.data.today_measure_sum;
-			
+
+			console.log('getSubscribeNumber', getSubscribeNumber);
+			if (getSubscribeNumber.code == 1) {
+				subscribeUserNumber.value = getSubscribeNumber.data.today_measure_sum;
+			}
 		}
 	})
 </script>

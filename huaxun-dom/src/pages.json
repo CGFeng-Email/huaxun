@@ -110,6 +110,20 @@
 				"navigationBarBackgroundColor": "#fff",
 				"navigationBarTitleText": "搜索"
 			}
+		},
+		{
+			"path": "pages/agreement/userAgreement",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "用户协议"
+			}
+		},
+		{
+			"path": "pages/agreement/privacyAgreement",
+			"style": {
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTitleText": "隐私协议"
+			}
 		}
 	],
 	"globalStyle": {

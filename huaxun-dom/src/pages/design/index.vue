@@ -5,29 +5,38 @@
 	<Tabs :type="2" title="风格" :list="styleList" :offsetTop="45" :currentIndex="styleIndex" @tabsClick="tabsClick">
 	</Tabs>
 	<view class="list">
-		<view class="item box_radius box_shadow" v-for="(item,index) in 7" :key="index" @click="openDetails">
+		<view class="item box_radius box_shadow" v-for="(item,index) in designList" :key="index" @click="openDetails(item.id)">
 			<view class="info flex">
 				<view class="head_portrait">
-					<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
+					<image class="cover" :src="item.image" mode="scaleToFill"></image>
 				</view>
 				<view class="content">
 					<view class="head">
-						<text class="name inlineBlock">朱炎东</text>
-						<text class="text">总设计师</text>
+						<text class="name inlineBlock">{{item.real_name}}</text>
+						<text class="text">{{item.grade_name}}</text>
 					</view>
 					<view class="lead">
-						从事室内设计行业24年
-						擅长风格：新中式，现代简约风格
+						{{item.remark}}
+					</view>
+					<view class="lead">
+						{{item.style_name}}
 					</view>
 				</view>
 			</view>
 			<view class="case flex">
-				<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-				<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
-				<image class="cover" src="/static/img/team_name_li1.jpg" mode="widthFix"></image>
+				<image class="cover" :src="item2" mode="widthFix" v-for="(item2,index2) in item.images" :key="index2">
+				</image>
 			</view>
 		</view>
+		
+		<!-- 加载更多 -->
+		<uv-load-more :status="status" fontSize="24" color="#000" marginTop="20" marginBottom="50"
+			loadmoreText="上拉加载更多" />
 	</view>
+
+	<!-- 登录 -->
+	<Login :show="login" @loginHide="loginHide"></Login>
+
 	<tabbar></tabbar>
 </template>
 
@@ -49,6 +58,8 @@
 		designListApi
 	} from '../../request/api.js';
 
+	// 登录弹窗
+	const login = ref(null);
 	// 等级
 	const gradeList = ref([]);
 	const gradeIndex = ref(null);
@@ -60,6 +71,7 @@
 	const totalPage = ref(0);
 	const status = ref('loadmore');
 	const rankIndex = ref(0);
+	const designList = ref([]);
 
 	const tabsClick = (e) => {
 		if (e.type == 1) {
@@ -79,15 +91,27 @@
 		getDesignList()
 	}
 
-	const openDetails = () => {
+	const openDetails = (id) => {
+		const token = uni.getStorageSync('token');
+
+		if (!token) {
+			login.value = true;
+			return;
+		}
+
 		uni.navigateTo({
-			url: '/pages/design/details'
+			url: `/pages/design/details?id=${id}`
 		})
+	}
+
+	const loginHide = () => {
+		login.value = false;
 	}
 
 	const getDesignList = async (more) => {
 		if (!more) {
 			page.value = 1;
+			designList.value = [];
 		}
 
 		const res = await designListApi({
@@ -102,6 +126,19 @@
 		});
 
 		console.log('designDetails', res);
+
+		if (res.code == 1) {
+			if (more) {
+				designList.value = [...designList.value, res.data.lists];
+				status.value = 'loadmore';
+			} else {
+				designList.value = res.data.lists;
+				totalPage.value = res.data.page_no;
+				if (totalPage.value <= 1) {
+					status.value = 'nomore';
+				}
+			}
+		}
 	}
 
 	onMounted(() => {
@@ -109,16 +146,16 @@
 		gradeList.value = commonData.designer_grade_select;
 		styleList.value = commonData.style_select;
 
-		getDesignList()
+		getDesignList();
 	})
-	
+
 	onReachBottom(() => {
 		if (page.value >= totalPage.value) {
 			status.value = 'nomore';
 		} else {
 			status.value = 'loading';
 			page.value++;
-			getCaseList(true);
+			getDesignList(true);
 		}
 	})
 </script>
@@ -152,6 +189,7 @@
 					image {
 						width: 100%;
 						height: 100%;
+						border-radius: 50%;
 					}
 				}
 
@@ -186,7 +224,7 @@
 				flex-wrap: wrap;
 
 				.cover {
-					width: 190rpx;
+					width: 200rpx;
 					margin: 0 10rpx 10rpx 0;
 				}
 			}

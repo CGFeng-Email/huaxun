@@ -2,31 +2,99 @@
 	<Search></Search>
 	<view class="list">
 		<div class="row flex">
-			<view class="col_md" v-for="(item,index) in 8" :key="index">
-				<view class="item box_radius box_shadow" @click="openDetails">
+			<view class="col_md" v-for="(item,index) in stewardList" :key="item.id">
+				<view class="item box_radius box_shadow" @click="openDetails(item.id)">
 					<view class="head_portrait box_shadow">
-						<image class="cover" src="/static/img/team_techer1.jpg" mode="scaleToFill"></image>
+						<image class="cover" :src="item.image" mode="scaleToFill"></image>
 					</view>
 					<view class="name">
-						朱炎东
+						{{item.real_name}}
 					</view>
 					<view class="label">
-						<text class="text inlineBlock box_radius">高级管家</text>
+						<text class="text inlineBlock box_radius">{{item.grade_name}}</text>
 					</view>
 				</view>
 			</view>
 		</div>
+		<!-- 加载更多 -->
+		<uv-load-more :status="status" fontSize="24" color="#000" marginTop="20" marginBottom="50"
+			loadmoreText="上拉加载更多" />
 	</view>
 </template>
 
 <script setup>
 	import Search from '@/component/search';
-	
-	const openDetails = () => {
+
+	import {
+		ref,
+		onMounted
+	} from 'vue';
+
+	import {
+		onReachBottom
+	} from '@dcloudio/uni-app';
+
+	import {
+		stewardCollectListApi
+	} from '../../request/api.js';
+
+	const size = ref(10);
+	const page = ref(1);
+	const totalPage = ref(0);
+	const status = ref('loadmore');
+	const stewardList = ref([]);
+
+	const openDetails = (id) => {
 		uni.navigateTo({
-			url: '/pages/steward/details'
+			url: `/pages/steward/details?id=${id}`
 		})
 	}
+
+	const getStewardList = async (more) => {
+		if (!more) {
+			page.value = 1;
+			stewardList.value = [];
+		}
+
+		const res = await stewardCollectListApi({
+			page: page.value,
+			size: size.value
+		}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		});
+
+		console.log('stewardList', res);
+
+		if (res.code == 1) {
+			if (more) {
+				stewardList.value = [...stewardList.value, res.data.lists];
+				status.value = 'loadmore';
+			} else {
+				stewardList.value = res.data.lists;
+				totalPage.value = res.data.page_no;
+				if (totalPage.value <= 1) {
+					status.value = 'nomore';
+				}
+			}
+		}
+	}
+
+	onMounted(() => {
+		getStewardList();
+	})
+
+	onReachBottom(() => {
+		if (page.value >= totalPage.value) {
+			status.value = 'nomore';
+		} else {
+			status.value = 'loading';
+			page.value++;
+			getStewardList(true);
+		}
+	})
 </script>
 
 <style>

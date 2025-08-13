@@ -1,5 +1,5 @@
 <template>
-	<view class="search">
+	<view class="search" @click="openSearch">
 		<view class="box justify_center">
 			<i class="iconfont icon-sousuo"></i>
 			<view class="text">大家都在搜：现代简约</view>
@@ -7,7 +7,12 @@
 	</view>
 </template>
 
-<script>
+<script setup>
+	const openSearch = () => {
+		uni.navigateTo({
+			url: '/pages/search/index'
+		})
+	}
 </script>
 
 <style lang="scss" scoped>

@@ -14,14 +14,15 @@
 			<view class="condition">
 				<view class="check" @click="condition = !condition">
 					<uni-icons class="icon" :type="condition ? 'checkbox-filled' : 'circle'" size="18"
-						color="#434343"></uni-icons>
+						color="#FF4E00"></uni-icons>
 					<text class="text">我已阅读并同意</text>
 				</view>
-				<text class="jump" @click="open_agreement">华浔用户协议、</text>
-				<text class="jump" @click="open_privacy">隐私政策</text>
+				<text class="jump" @click="openUserAgreement">华浔用户协议、</text>
+				<text class="jump" @click="openPrivacyAgreement">隐私政策</text>
 			</view>
 		</view>
-		<view style="height: 160rpx;"></view>
+		
+		<view style="height: 160rpx;" v-if="placeHeight"></view>
 	</uni-popup>
 </template>
 
@@ -46,10 +47,12 @@
 		show: {
 			type: Boolean,
 			default: false
+		},
+		placeHeight: {
+			type: Boolean,
+			default: true
 		}
 	});
-
-	console.log('show', props.show);
 
 	// 弹窗、显示/隐藏
 	const login_popup = ref(null);
@@ -60,7 +63,7 @@
 	watch(
 		() => props.show,
 		(newVal) => {
-			console.log('newVal', newVal);
+			console.log('loginWatch', newVal);
 			if (newVal) {
 				login_popup.value.open();
 			} else {
@@ -111,9 +114,14 @@
 					// 登录成功
 					if (getLogin.code == 1) {
 						uni.setStorageSync('token', getLogin.data.token);
+						emit('loginHide', {
+							isLogin: true
+						});
+					} else {
+						emit('loginHide', {
+							isLogin: false
+						});
 					}
-					
-					emit('loginHide');
 				}
 			}
 		});
@@ -123,20 +131,22 @@
 
 	// 关闭弹窗
 	function loginHide() {
-		emit('loginHide');
-	}
-
-	// 协议
-	function open_agreement() {
-		uni.navigateTo({
-			url: '/pages/condition/agreement'
+		emit('loginHide', {
+			isLogin: false
 		});
 	}
 
-	// 隐私
-	function open_privacy() {
+	// 用户协议
+	function openUserAgreement() {
 		uni.navigateTo({
-			url: '/pages/condition/privacy'
+			url: '/pages/agreement/userAgreement'
+		});
+	}
+
+	// 隐私协议
+	function openPrivacyAgreement() {
+		uni.navigateTo({
+			url: '/pages/agreement/privacyAgreement'
 		});
 	}
 </script>

@@ -7,14 +7,23 @@
 			<template v-slot:list1>
 				<!-- 为了磨平部分平台的BUG，必须套一层view -->
 				<view>
-					<view v-for="(item, index) in list1" :key="item.id" class="waterfall-item" @click="clickItem">
+					<view v-for="(item, index) in list1" :key="item.id" class="waterfall-item"
+						@click="clickItem(item.id)">
 						<view class="waterfall-item__image" :style="imageStyle(item)">
 							<image :src="item.image" mode="widthFix" :style="{width:item.width+'px'}"></image>
 						</view>
 						<view class="content" v-if="item.title">
 							<view class="label_list">
-								<text class="text inlineBlock box_radius box_shadow" v-for="labelItem in item.label"
-									:key="labelItem">{{labelItem}}</text>
+								<!-- 风格 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.style_name}}</text>
+								<!-- 户型 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.house_name}}</text>
+								<!-- 楼盘 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.place}}</text>
+								<!-- 图形 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.grap_name}}</text>
+								<!-- 面积范围 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.area_name}}</text>
 							</view>
 							<view class="title">
 								{{item.title}}
@@ -22,11 +31,12 @@
 							<view class="property justify_space">
 								<view class="click justify_center">
 									<i class="iconfont icon-chakan"></i>
-									<text class="text inlineBlock">{{item.see}}</text>
+									<text class="text inlineBlock">{{item.view_actual}}</text>
 								</view>
 								<view class="click justify_center">
-									<i class="iconfont icon-shoucang"></i>
-									<text class="text inlineBlock">{{item.collect}}</text>
+									<i class="iconfont icon-shoucang" v-if="item.is_collect == 0"></i>
+									<i class="iconfont icon-shoucang1 active" v-else></i>
+									<text class="text inlineBlock">{{item.collect_num}}</text>
 								</view>
 							</view>
 						</view>
@@ -37,14 +47,23 @@
 			<template v-slot:list2>
 				<!-- 为了磨平部分平台的BUG，必须套一层view -->
 				<view>
-					<view v-for="(item, index) in list2" :key="item.id" class="waterfall-item" @click="clickItem">
+					<view v-for="(item, index) in list2" :key="item.id" class="waterfall-item"
+						@click="clickItem(item.id)">
 						<view class="waterfall-item__image" :style="imageStyle(item)">
 							<image :src="item.image" mode="widthFix" :style="{width:item.width+'px'}"></image>
 						</view>
 						<view class="content" v-if="item.title">
 							<view class="label_list">
-								<text class="text inlineBlock box_radius box_shadow" v-for="labelItem in item.label"
-									:key="labelItem">{{labelItem}}</text>
+								<!-- 风格 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.style_name}}</text>
+								<!-- 户型 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.house_name}}</text>
+								<!-- 楼盘 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.place}}</text>
+								<!-- 图形 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.grap_name}}</text>
+								<!-- 面积范围 -->
+								<text class="text inlineBlock box_radius box_shadow">{{item.area_name}}</text>
 							</view>
 							<view class="title">
 								{{item.title}}
@@ -52,11 +71,12 @@
 							<view class="property justify_space">
 								<view class="click justify_center">
 									<i class="iconfont icon-chakan"></i>
-									{{item.see}}
+									<text class="text inlineBlock">{{item.view_actual}}</text>
 								</view>
 								<view class="click justify_center">
-									{{item.collect}}
-									<i class="iconfont icon-shoucang"></i>
+									<i class="iconfont icon-shoucang" v-if="item.is_collect == 0"></i>
+									<i class="iconfont icon-shoucang1 active" v-else></i>
+									<text class="text inlineBlock">{{item.collect_num}}</text>
 								</view>
 							</view>
 						</view>
@@ -64,6 +84,10 @@
 				</view>
 			</template>
 		</uv-waterfall>
+
+		<!-- 加载更多 -->
+		<uv-load-more :status="status" fontSize="24" color="#000" marginTop="20" marginBottom="50"
+			loadmoreText="上拉加载更多" />
 	</view>
 </template>
 
@@ -71,67 +95,29 @@
 	import Search from '@/component/search';
 	import {
 		ref,
-		computed
+		computed,
+		onMounted
 	} from 'vue';
 
+	import {
+		onReachBottom
+	} from '@dcloudio/uni-app';
+
+	import {
+		caseCollectListApi
+	} from '../../request/api.js';
+
+	const waterfall = ref(null);
 	const leftGap = ref(10);
 	const rightGap = ref(10);
 	const columnGap = ref(10);
 	const list1 = ref([]);
 	const list2 = ref([]);
-	const caseList = ref([{
-			image: '/static/img/case_li1.jpg',
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		},
-		{
-			image: '/static/img/case_li2.jpg',
-			title: '长沙润府-轻奢风格-220㎡-四房',
-			label: ['现代轻奢', '四居室', '220㎡'],
-			see: 533,
-			collect: 268
-		}
-	])
+	const caseList = ref([]);
+	const size = ref(10);
+	const totalPage = ref(null);
+	const page = ref(1);
+	const status = ref('loadmore');
 
 	const imageStyle = computed(item => {
 		return item => {
@@ -147,7 +133,6 @@
 	})
 
 	const changeList = (e) => {
-		console.log('e', e);
 		if (e.name == 'list1') {
 			list1.value.push(e.value);
 		} else {
@@ -155,16 +140,68 @@
 		}
 	}
 
-	const clickItem = () => {
+	const clickItem = (id) => {
 		uni.navigateTo({
-			url: '/pages/case/details'
+			url: `/pages/case/details?id=${id}`
 		})
 	}
+
+	// 案例列表
+	const getCaseList = async (more = false) => {
+		if (!more) {
+			page.value = 1;
+			list1.value = [];
+			list2.value = [];
+			waterfall.value.clear();
+		}
+
+		const res = await caseCollectListApi({
+			page: page.value,
+			size: size.value,
+		}, {
+			custom: {
+				catch: true,
+				token: true
+			}
+		})
+
+		console.log('caseList', res);
+		if (res.code == 1) {
+			if (more) {
+				caseList.value = [...caseList.value, ...res.data.lists];
+				status.value = 'loadmore';
+			} else {
+				caseList.value = res.data.lists;
+				totalPage.value = res.data.page_no;
+				if (totalPage.value <= 1) {
+					status.value = 'nomore'
+				}
+			}
+		}
+	}
+
+	onReachBottom(() => {
+		if (page.value >= totalPage.value) {
+			status.value = 'nomore';
+		} else {
+			status.value = 'loading';
+			page.value++;
+			getCaseList(true);
+		}
+	})
+
+	onMounted(() => {
+		getCaseList();
+	})
 </script>
 
 <style lang="scss" scoped>
 	$show-lines: 1;
 	@import '@/uni_modules/uv-ui-tools/libs/css/variable.scss';
+	
+	.list {
+		padding-bottom: 40rpx;
+	}
 
 	.waterfall-item {
 		overflow: hidden;
